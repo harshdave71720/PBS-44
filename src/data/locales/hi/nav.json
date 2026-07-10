@@ -1,0 +1,20 @@
+{
+  "cta": "आवेदन करें",
+  "items": [
+    { "label": "होम", "href": "/" },
+    {
+      "label": "सेवाएं",
+      "href": "/services",
+      "children": [
+        { "label": "प्रमाण पत्र", "href": "/services/certificates" },
+        { "label": "भूमि अभिलेख", "href": "/services/land-records" },
+        { "label": "शिकायत निवारण", "href": "/services/grievance" }
+      ]
+    },
+    { "label": "घोषणाएं", "href": "/announcements" },
+    { "label": "आयोजन", "href": "/events" },
+    { "label": "गैलरी", "href": "/gallery" },
+    { "label": "हमारे बारे में", "href": "/about" },
+    { "label": "संपर्क", "href": "/contact" }
+  ]
+}

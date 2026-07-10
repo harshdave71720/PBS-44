@@ -1,0 +1,145 @@
+{
+  "hero": {
+    "badge": "Digital India • Digital Village",
+    "heading": "Always Ready\nTo Serve You",
+    "subheading": "Jan Seva Portal — a dedicated digital platform for unity and progress of Indian communities. Access all government services, community news, and event information in one place.",
+    "ctaPrimary": "View Services",
+    "ctaSecondary": "About Us"
+  },
+  "announcements": {
+    "heading": "Latest Announcements",
+    "subheading": "Important notices and news for the community",
+    "viewAll": "View All Announcements",
+    "items": [
+      {
+        "id": "ann-1",
+        "title": "Special Gram Sabha Meeting — 15 July 2026",
+        "date": "10 July 2026",
+        "category": "notice",
+        "description": "All villagers are informed that a special Gram Sabha meeting will be held on 15 July at 10 AM at the Gram Panchayat Bhawan.",
+        "href": "/announcements/gram-sabha-july"
+      },
+      {
+        "id": "ann-2",
+        "title": "Applications Open for New Water Connections",
+        "date": "8 July 2026",
+        "category": "news",
+        "description": "Applications for new domestic water connections in the Gram Panchayat have begun. Interested families can apply until 31 July.",
+        "href": "/announcements/water-connection"
+      },
+      {
+        "id": "ann-3",
+        "title": "Cleanliness Drive — 20 July 2026",
+        "date": "5 July 2026",
+        "category": "event",
+        "description": "A special cleanliness drive will be organized by the Gram Panchayat. Cooperation from all citizens is expected.",
+        "href": "/announcements/swachhata-abhiyan"
+      },
+      {
+        "id": "ann-4",
+        "title": "PM Awas Yojana — List of Eligible Beneficiaries",
+        "date": "1 July 2026",
+        "category": "alert",
+        "description": "The list of eligible beneficiaries under PM Awas Yojana is available at the Gram Panchayat office.",
+        "href": "/announcements/pmay-list"
+      }
+    ]
+  },
+  "services": {
+    "heading": "Our Services",
+    "subheading": "Simple, fast, and transparent — all government services at your fingertips",
+    "items": [
+      {
+        "id": "svc-1",
+        "title": "Birth Certificate",
+        "description": "Apply online for a birth certificate and receive it at home.",
+        "icon": "baby",
+        "href": "/services/birth-certificate"
+      },
+      {
+        "id": "svc-2",
+        "title": "Death Certificate",
+        "description": "Easy online application process for death certificates.",
+        "icon": "scroll",
+        "href": "/services/death-certificate"
+      },
+      {
+        "id": "svc-3",
+        "title": "Residence Certificate",
+        "description": "Get your residence certificate quickly and easily.",
+        "icon": "home",
+        "href": "/services/residence-certificate"
+      },
+      {
+        "id": "svc-4",
+        "title": "Marriage Certificate",
+        "description": "Online application and registration for marriage certificates.",
+        "icon": "heart",
+        "href": "/services/marriage-certificate"
+      },
+      {
+        "id": "svc-5",
+        "title": "Land Records",
+        "description": "View your land details, maps, and rights records.",
+        "icon": "map",
+        "href": "/services/land-records"
+      },
+      {
+        "id": "svc-6",
+        "title": "Grievance Redressal",
+        "description": "Register your problem or complaint online and get resolution.",
+        "icon": "message-circle",
+        "href": "/services/grievance"
+      }
+    ]
+  },
+  "about": {
+    "badge": "About Us",
+    "heading": "Serving the Community,\nOur Commitment",
+    "description": [
+      "Jan Seva Portal is a dedicated digital service platform for rural and semi-urban communities of India. Our aim is to make government services simple, transparent, and accessible for every citizen.",
+      "We are founded on three core values: Unity, Service, and Progress. Our team works day and night for the betterment of the community, ensuring every family receives proper services and information."
+    ],
+    "stats": [
+      { "value": "50,000+", "label": "Beneficiary Families" },
+      { "value": "25+", "label": "Services Available" },
+      { "value": "15", "label": "Years of Experience" },
+      { "value": "99%", "label": "Satisfaction Rate" }
+    ],
+    "cta": "Learn More About Us"
+  },
+  "events": {
+    "heading": "Upcoming Events",
+    "subheading": "Important community programs and festivals",
+    "viewAll": "View All Events",
+    "items": [
+      {
+        "id": "evt-1",
+        "title": "Annual Village Festival 2026",
+        "date": "25 July 2026",
+        "time": "9:00 AM",
+        "location": "Gram Panchayat Ground",
+        "description": "Our village's annual festival — cultural programs, sports competitions, and prize distribution.",
+        "category": "Festival"
+      },
+      {
+        "id": "evt-2",
+        "title": "Free Health Camp",
+        "date": "18 July 2026",
+        "time": "8 AM – 2 PM",
+        "location": "Primary Health Centre",
+        "description": "Free health check-up, medicines, and specialist consultation for all citizens.",
+        "category": "Health"
+      },
+      {
+        "id": "evt-3",
+        "title": "Youth Sports Competition",
+        "date": "20 July 2026",
+        "time": "4:00 PM",
+        "location": "Sports Ground",
+        "description": "Cricket, Kabaddi, and wrestling competitions for youth aged 15–25.",
+        "category": "Sports"
+      }
+    ]
+  }
+}
