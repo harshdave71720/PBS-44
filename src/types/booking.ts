@@ -424,8 +424,8 @@ export interface IAuditLog {
   entityId: string
   action: "create" | "update" | "delete" | "approve" | "reject"
   changedBy: string
-  oldValues?: Record<string, any>
-  newValues?: Record<string, any>
+  oldValues?: Record<string, unknown>
+  newValues?: Record<string, unknown>
   timestamp: Date
   remarks?: string
 }

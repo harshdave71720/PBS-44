@@ -1,0 +1,195 @@
+{
+  "events": [
+    {
+      "id": "EVENT_001",
+      "code": "sooraj_pooja",
+      "nameHindi": "सूरज पूजा",
+      "nameEnglish": "Sooraj Pooja",
+      "description": "भगवान सूरज को समर्पित पूजा",
+      "memberCharge": 500,
+      "nonMemberCharge": 1000,
+      "allowedAreas": [
+        "TERRACE",
+        "GARDEN"
+      ],
+      "allowedTimeSlots": [
+        "MORNING"
+      ],
+      "defaultArea": "TERRACE",
+      "requiresApproval": false,
+      "estimatedDuration": "1-2 hours",
+      "notes": "सुबह के समय आयोजित होता है"
+    },
+    {
+      "id": "EVENT_002",
+      "code": "uttara_kary",
+      "nameHindi": "उत्तर कार्य",
+      "nameEnglish": "Uttara Kary",
+      "description": "श्मशान के बाद का धार्मिक अनुष्ठान",
+      "memberCharge": 1500,
+      "nonMemberCharge": 3000,
+      "allowedAreas": [
+        "MAIN_HALL",
+        "DRAWING_ROOM",
+        "KITCHEN_AREA"
+      ],
+      "allowedTimeSlots": [
+        "MORNING",
+        "AFTERNOON"
+      ],
+      "defaultArea": "MAIN_HALL",
+      "requiresApproval": true,
+      "estimatedDuration": "2-4 hours",
+      "notes": "परिवार के साथ आयोजित होता है"
+    },
+    {
+      "id": "EVENT_003",
+      "code": "barsi",
+      "nameHindi": "बरसी",
+      "nameEnglish": "Barsi",
+      "description": "मृत्यु वर्षगांठ पर धार्मिक समारोह",
+      "memberCharge": 800,
+      "nonMemberCharge": 1500,
+      "allowedAreas": [
+        "MAIN_HALL",
+        "DRAWING_ROOM",
+        "CONFERENCE_ROOM",
+        "KITCHEN_AREA"
+      ],
+      "allowedTimeSlots": [
+        "MORNING",
+        "AFTERNOON"
+      ],
+      "defaultArea": "MAIN_HALL",
+      "requiresApproval": true,
+      "estimatedDuration": "2-3 hours",
+      "notes": "पारिवारिक और सामाजिक समारोह"
+    },
+    {
+      "id": "EVENT_004",
+      "code": "shraddha_paksh",
+      "nameHindi": "श्राद्ध पक्ष",
+      "nameEnglish": "Shraddha Paksh",
+      "description": "पितरों को समर्पित पखवाड़ा",
+      "memberCharge": 1200,
+      "nonMemberCharge": 2500,
+      "allowedAreas": [
+        "MAIN_HALL",
+        "DRAWING_ROOM",
+        "KITCHEN_AREA"
+      ],
+      "allowedTimeSlots": [
+        "MORNING",
+        "AFTERNOON"
+      ],
+      "defaultArea": "MAIN_HALL",
+      "requiresApproval": true,
+      "estimatedDuration": "2-3 hours",
+      "notes": "भाद्रपद मास में आयोजित होता है"
+    },
+    {
+      "id": "EVENT_005",
+      "code": "marriage",
+      "nameHindi": "विवाह",
+      "nameEnglish": "Marriage",
+      "description": "विवाह समारोह और रिसेप्शन",
+      "memberCharge": 5000,
+      "nonMemberCharge": 10000,
+      "allowedAreas": [
+        "MAIN_HALL",
+        "GARDEN",
+        "TERRACE",
+        "KITCHEN_AREA",
+        "PARKING"
+      ],
+      "allowedTimeSlots": [
+        "AFTERNOON",
+        "EVENING",
+        "FULL_DAY"
+      ],
+      "defaultArea": "MAIN_HALL",
+      "requiresApproval": true,
+      "estimatedDuration": "4-8 hours",
+      "notes": "अग्रिम बुकिंग आवश्यक है, सजावट की सुविधा उपलब्ध"
+    },
+    {
+      "id": "EVENT_006",
+      "code": "birthday_party",
+      "nameHindi": "जन्मदिन पार्टी",
+      "nameEnglish": "Birthday Party",
+      "description": "जन्मदिन का जश्न",
+      "memberCharge": 1500,
+      "nonMemberCharge": 3000,
+      "allowedAreas": [
+        "MAIN_HALL",
+        "DRAWING_ROOM",
+        "GARDEN",
+        "KITCHEN_AREA"
+      ],
+      "allowedTimeSlots": [
+        "AFTERNOON",
+        "EVENING"
+      ],
+      "defaultArea": "DRAWING_ROOM",
+      "requiresApproval": false,
+      "estimatedDuration": "2-4 hours",
+      "notes": "पारिवारिक समारोह के लिए उपयुक्त"
+    },
+    {
+      "id": "EVENT_007",
+      "code": "mahila_sangeet",
+      "nameHindi": "महिला संगीत",
+      "nameEnglish": "Mahila Sangeet",
+      "description": "विवाह से पहले महिलाओं का सांस्कृतिक कार्यक्रम",
+      "memberCharge": 1000,
+      "nonMemberCharge": 2000,
+      "allowedAreas": [
+        "MAIN_HALL",
+        "DRAWING_ROOM",
+        "GARDEN",
+        "KITCHEN_AREA"
+      ],
+      "allowedTimeSlots": [
+        "AFTERNOON",
+        "EVENING"
+      ],
+      "defaultArea": "MAIN_HALL",
+      "requiresApproval": false,
+      "estimatedDuration": "2-3 hours",
+      "notes": "महिलाओं के लिए विशेष सांस्कृतिक आयोजन"
+    },
+    {
+      "id": "EVENT_008",
+      "code": "other",
+      "nameHindi": "अन्य",
+      "nameEnglish": "Other",
+      "description": "अन्य कोई सामाजिक/सांस्कृतिक आयोजन",
+      "memberCharge": 2000,
+      "nonMemberCharge": 4000,
+      "allowedAreas": [
+        "MAIN_HALL",
+        "DRAWING_ROOM",
+        "CONFERENCE_ROOM",
+        "GARDEN",
+        "KITCHEN_AREA"
+      ],
+      "allowedTimeSlots": [
+        "MORNING",
+        "AFTERNOON",
+        "EVENING",
+        "FULL_DAY"
+      ],
+      "defaultArea": "MAIN_HALL",
+      "requiresApproval": true,
+      "estimatedDuration": "Variable",
+      "notes": "अन्य किसी भी प्रकार के आयोजन के लिए"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2026-07-10",
+    "description": "PBS-44 Society Event Master Configuration",
+    "currency": "INR",
+    "notes": "All charges are in Indian Rupees. Member charges apply to society members. Non-member charges apply to external bookings."
+  }
+}

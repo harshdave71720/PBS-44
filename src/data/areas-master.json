@@ -1,0 +1,131 @@
+{
+  "areas": [
+    {
+      "id": "AREA_001",
+      "code": "GF",
+      "displayName": "Bhutal",
+      "displayNameHindi": "भूतल",
+      "capacity": 250,
+      "description": "Ground floor main area with excellent ventilation and accessibility",
+      "descriptionHindi": "भूतल पर स्थित मुख्य हॉल, उत्तम वेंटिलेशन और पहुंच सुविधा के साथ",
+      "amenities": [
+        "Central AC",
+        "Sound system",
+        "Stage area",
+        "Multiple entrances",
+        "Adequate parking"
+      ],
+      "dimensions": {
+        "length": 45,
+        "width": 35,
+        "height": 12,
+        "unit": "feet"
+      },
+      "sortOrder": 1,
+      "enabled": true
+    },
+    {
+      "id": "AREA_002",
+      "code": "SPH",
+      "displayName": "Sooraj Poojan Hall",
+      "displayNameHindi": "सूरज पूजन हॉल",
+      "capacity": 150,
+      "description": "Dedicated prayer hall with natural light, ideal for religious ceremonies",
+      "descriptionHindi": "प्रार्थना के लिए समर्पित हॉल, प्राकृतिक प्रकाश के साथ, धार्मिक समारोहों के लिए आदर्श",
+      "amenities": [
+        "Natural lighting",
+        "Prayer platform",
+        "Peaceful ambiance",
+        "Basic AC",
+        "Separate entrance"
+      ],
+      "dimensions": {
+        "length": 30,
+        "width": 25,
+        "height": 10,
+        "unit": "feet"
+      },
+      "sortOrder": 2,
+      "enabled": true
+    },
+    {
+      "id": "AREA_003",
+      "code": "FLW",
+      "displayName": "First Floor Left Wing",
+      "displayNameHindi": "प्रथम तल बायां विंग",
+      "capacity": 120,
+      "description": "First floor left section, flexible space for medium gatherings",
+      "descriptionHindi": "प्रथम तल का बायां हिस्सा, मध्यम आकार के समारोहों के लिए लचीली जगह",
+      "amenities": [
+        "Air conditioned",
+        "Flexible layout",
+        "Natural light",
+        "Staircase access",
+        "Restroom nearby"
+      ],
+      "dimensions": {
+        "length": 35,
+        "width": 20,
+        "height": 10,
+        "unit": "feet"
+      },
+      "sortOrder": 3,
+      "enabled": true
+    },
+    {
+      "id": "AREA_004",
+      "code": "FRW",
+      "displayName": "First Floor Right Wing",
+      "displayNameHindi": "प्रथम तल दायां विंग",
+      "capacity": 120,
+      "description": "First floor right section, similar to left wing with independent access",
+      "descriptionHindi": "प्रथम तल का दायां हिस्सा, बायें विंग के समान, स्वतंत्र प्रवेश के साथ",
+      "amenities": [
+        "Air conditioned",
+        "Flexible layout",
+        "Natural light",
+        "Staircase access",
+        "Restroom nearby"
+      ],
+      "dimensions": {
+        "length": 35,
+        "width": 20,
+        "height": 10,
+        "unit": "feet"
+      },
+      "sortOrder": 4,
+      "enabled": true
+    },
+    {
+      "id": "AREA_005",
+      "code": "RT",
+      "displayName": "Roof Top",
+      "displayNameHindi": "छत",
+      "capacity": 200,
+      "description": "Open rooftop space ideal for outdoor events, gardens, and sky-view celebrations",
+      "descriptionHindi": "खुली छत की जगह, बाहरी आयोजनों, बागों और आसमान के दृश्य के साथ समारोहों के लिए आदर्श",
+      "amenities": [
+        "Open air",
+        "City view",
+        "Garden space",
+        "Lighting setup available",
+        "Partial covering"
+      ],
+      "dimensions": {
+        "length": 50,
+        "width": 40,
+        "height": "Open",
+        "unit": "feet"
+      },
+      "sortOrder": 5,
+      "enabled": true
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2026-07-10",
+    "description": "PBS-44 Society Area Master Configuration",
+    "totalCapacity": 840,
+    "notes": "All capacity figures are approximate and can be adjusted based on event type and arrangement."
+  }
+}
