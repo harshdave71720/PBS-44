@@ -21,9 +21,12 @@ export function Footer({ navItems, common }: FooterProps) {
           {/* Brand column */}
           <div className="space-y-4">
             <div>
-              <h3 className="text-xl font-bold">{siteConfig.name}</h3>
+              <h3 className="text-lg font-bold leading-snug">{siteConfig.name}</h3>
               <p className="text-sm text-primary-foreground/70 mt-1">
                 {siteConfig.tagline}
+              </p>
+              <p className="text-xs text-accent mt-2 font-medium">
+                पंजीयन क्रमांक : {siteConfig.registrationNumber}
               </p>
             </div>
             <p className="text-sm text-primary-foreground/80 leading-relaxed">
@@ -81,19 +84,19 @@ export function Footer({ navItems, common }: FooterProps) {
             </ul>
           </div>
 
-          {/* Services */}
+          {/* Booking modules */}
           <div className="space-y-4">
             <h4 className="text-sm font-semibold uppercase tracking-wider text-accent">
-              सेवाएं
+              बुकिंग मॉड्यूल
             </h4>
             <ul className="space-y-2">
               {[
-                { label: "जन्म प्रमाण पत्र", href: "/services/birth-certificate" },
-                { label: "मृत्यु प्रमाण पत्र", href: "/services/death-certificate" },
-                { label: "निवास प्रमाण पत्र", href: "/services/residence-certificate" },
-                { label: "विवाह प्रमाण पत्र", href: "/services/marriage-certificate" },
-                { label: "भूमि अभिलेख", href: "/services/land-records" },
-                { label: "शिकायत निवारण", href: "/services/grievance" },
+                { label: "नया भवन बुकिंग आवेदन", href: "/booking" },
+                { label: "उपलब्धता जांच", href: "/booking" },
+                { label: "क्षेत्र आवंटन सुझाव", href: "/booking" },
+                { label: "समिति अनुमोदन स्थिति", href: "/booking" },
+                { label: "भुगतान सत्यापन ट्रैकिंग", href: "/booking" },
+                { label: "बुकिंग जीवनचक्र स्थिति", href: "/booking" },
               ].map((item) => (
                 <li key={item.href}>
                   <Link
@@ -116,7 +119,7 @@ export function Footer({ navItems, common }: FooterProps) {
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm text-primary-foreground/80">
                 <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-accent" />
-                <span>{siteConfig.contact.address}</span>
+                <span className="whitespace-pre-line">{siteConfig.contact.address}</span>
               </li>
               <li className="flex items-center gap-2 text-sm text-primary-foreground/80">
                 <Phone className="h-4 w-4 shrink-0 text-accent" />

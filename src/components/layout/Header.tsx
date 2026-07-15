@@ -25,8 +25,11 @@ export function Header({ nav }: HeaderProps) {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex flex-col leading-none group">
-          <span className="text-xl font-bold tracking-tight group-hover:text-accent transition-colors">
-            {siteConfig.name}
+          <span
+            className="text-xl font-bold tracking-tight group-hover:text-accent transition-colors"
+            title={siteConfig.name}
+          >
+            {siteConfig.shortName}
           </span>
           <span className="text-[10px] font-medium tracking-widest text-primary-foreground/70 uppercase">
             {siteConfig.tagline}
@@ -79,7 +82,7 @@ export function Header({ nav }: HeaderProps) {
         {/* CTA + mobile menu */}
         <div className="flex items-center gap-2">
           <Link
-            href="/services"
+            href="/booking"
             className={cn(
               buttonVariants({ size: "sm" }),
               "hidden sm:flex bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"

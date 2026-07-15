@@ -33,10 +33,10 @@ export function AboutSection({ about }: AboutSectionProps) {
             {/* Feature list */}
             <ul className="space-y-2">
               {[
-                "पारदर्शी और जवाबदेह प्रशासन",
-                "नागरिक-केंद्रित डिजिटल सेवाएं",
-                "त्वरित शिकायत निवारण प्रणाली",
-                "महिला और युवा सशक्तिकरण कार्यक्रम",
+                "इवेंट मास्टर आधारित कार्यक्रम चयन",
+                "क्षेत्र मास्टर आधारित क्षेत्र सुझाव",
+                "उपलब्धता इंजन द्वारा स्लॉट जांच",
+                "समिति अनुमोदन और भुगतान सत्यापन प्रवाह",
               ].map((point) => (
                 <li key={point} className="flex items-start gap-2.5">
                   <CheckCircle2 className="h-5 w-5 shrink-0 text-accent mt-0.5" />

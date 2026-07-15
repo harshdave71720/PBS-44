@@ -1,144 +1,146 @@
 {
   "hero": {
-    "badge": "Digital India • Digital Village",
-    "heading": "Always Ready\nTo Serve You",
-    "subheading": "Jan Seva Portal — a dedicated digital platform for unity and progress of Indian communities. Access all government services, community news, and event information in one place.",
-    "ctaPrimary": "View Services",
-    "ctaSecondary": "About Us"
+    "badge": "Jai Charbhuja Ri",
+    "heading": "Jai Charbhuja Ri",
+    "subheading": "Shri Paliwal Brahman Samaj Panchayat 44 Shreni (Regd.), Indore",
+    "registration": "Registration No.: 03/27/03/08161/31-12-04",
+    "description": "Official portal for Bhavan booking, area allocation, committee approval, and payment verification.",
+    "ctaPrimary": "Book Bhavan",
+    "ctaSecondary": "About Society"
   },
   "announcements": {
-    "heading": "Latest Announcements",
-    "subheading": "Important notices and news for the community",
+    "heading": "Important Notices",
+    "subheading": "Latest updates for Bhavan booking and operations",
     "viewAll": "View All Announcements",
     "items": [
       {
         "id": "ann-1",
-        "title": "Special Gram Sabha Meeting — 15 July 2026",
+        "title": "Committee Review Meeting",
         "date": "10 July 2026",
         "category": "notice",
-        "description": "All villagers are informed that a special Gram Sabha meeting will be held on 15 July at 10 AM at the Gram Panchayat Bhawan.",
-        "href": "/announcements/gram-sabha-july"
+        "description": "A committee review meeting for pending booking applications will be conducted on 15 July.",
+        "href": "/announcements/committee-review"
       },
       {
         "id": "ann-2",
-        "title": "Applications Open for New Water Connections",
+        "title": "Main Hall Maintenance Notice",
         "date": "8 July 2026",
         "category": "news",
-        "description": "Applications for new domestic water connections in the Gram Panchayat have begun. Interested families can apply until 31 July.",
-        "href": "/announcements/water-connection"
+        "description": "Due to scheduled maintenance, Main Hall evening slot on 18 July will remain unavailable.",
+        "href": "/announcements/main-hall-maintenance"
       },
       {
         "id": "ann-3",
-        "title": "Cleanliness Drive — 20 July 2026",
+        "title": "Payment Verification Process",
         "date": "5 July 2026",
         "category": "event",
-        "description": "A special cleanliness drive will be organized by the Gram Panchayat. Cooperation from all citizens is expected.",
-        "href": "/announcements/swachhata-abhiyan"
+        "description": "Applicants are advised to provide payment references promptly for faster verification.",
+        "href": "/announcements/payment-verification"
       },
       {
         "id": "ann-4",
-        "title": "PM Awas Yojana — List of Eligible Beneficiaries",
+        "title": "Special Shraddha Slots",
         "date": "1 July 2026",
         "category": "alert",
-        "description": "The list of eligible beneficiaries under PM Awas Yojana is available at the Gram Panchayat office.",
-        "href": "/announcements/pmay-list"
+        "description": "Additional morning slots for Shraddha Paksh are available under committee approval.",
+        "href": "/announcements/shraddha-special-slots"
       }
     ]
   },
   "services": {
-    "heading": "Our Services",
-    "subheading": "Simple, fast, and transparent — all government services at your fingertips",
+    "heading": "Bhavan Booking Services",
+    "subheading": "End-to-end booking workflow from request to confirmation",
     "items": [
       {
         "id": "svc-1",
-        "title": "Birth Certificate",
-        "description": "Apply online for a birth certificate and receive it at home.",
+        "title": "New Booking Request",
+        "description": "Submit a new Bhavan booking request based on your event type.",
         "icon": "baby",
-        "href": "/services/birth-certificate"
+        "href": "/booking"
       },
       {
         "id": "svc-2",
-        "title": "Death Certificate",
-        "description": "Easy online application process for death certificates.",
+        "title": "Availability Check",
+        "description": "Check date and slot availability with food and coordination rules.",
         "icon": "scroll",
-        "href": "/services/death-certificate"
+        "href": "/booking"
       },
       {
         "id": "svc-3",
-        "title": "Residence Certificate",
-        "description": "Get your residence certificate quickly and easily.",
+        "title": "Area Suggestions",
+        "description": "Get suitable area suggestions based on event and expected guests.",
         "icon": "home",
-        "href": "/services/residence-certificate"
+        "href": "/booking"
       },
       {
         "id": "svc-4",
-        "title": "Marriage Certificate",
-        "description": "Online application and registration for marriage certificates.",
+        "title": "Committee Approval",
+        "description": "Track manual review and approval-required booking requests.",
         "icon": "heart",
-        "href": "/services/marriage-certificate"
+        "href": "/booking"
       },
       {
         "id": "svc-5",
-        "title": "Land Records",
-        "description": "View your land details, maps, and rights records.",
+        "title": "Payment Verification",
+        "description": "Track payment pending and payment verification status for approved bookings.",
         "icon": "map",
-        "href": "/services/land-records"
+        "href": "/booking"
       },
       {
         "id": "svc-6",
-        "title": "Grievance Redressal",
-        "description": "Register your problem or complaint online and get resolution.",
+        "title": "Booking Status Tracking",
+        "description": "Track the lifecycle from REQUEST_RECEIVED to CONFIRMED.",
         "icon": "message-circle",
-        "href": "/services/grievance"
+        "href": "/booking"
       }
     ]
   },
   "about": {
-    "badge": "About Us",
-    "heading": "Serving the Community,\nOur Commitment",
+    "badge": "About Society",
+    "heading": "Shri Paliwal Brahman Samaj Panchayat 44 Shreni\n(Regd.), Indore",
     "description": [
-      "Jan Seva Portal is a dedicated digital service platform for rural and semi-urban communities of India. Our aim is to make government services simple, transparent, and accessible for every citizen.",
-      "We are founded on three core values: Unity, Service, and Progress. Our team works day and night for the betterment of the community, ensuring every family receives proper services and information."
+      "This official digital platform is designed to make Society Bhavan booking structured, transparent, and timely.",
+      "Applicants can submit requests, check area availability, follow committee approvals, and track payment verification in one place."
     ],
     "stats": [
-      { "value": "50,000+", "label": "Beneficiary Families" },
-      { "value": "25+", "label": "Services Available" },
-      { "value": "15", "label": "Years of Experience" },
-      { "value": "99%", "label": "Satisfaction Rate" }
+      { "value": "44", "label": "Society Category" },
+      { "value": "03/27/03/08161/31-12-04", "label": "Registration No." },
+      { "value": "2", "label": "Primary Slots" },
+      { "value": "100%", "label": "Booking Traceability" }
     ],
-    "cta": "Learn More About Us"
+    "cta": "Learn Booking Workflow"
   },
   "events": {
-    "heading": "Upcoming Events",
-    "subheading": "Important community programs and festivals",
+    "heading": "Upcoming Booked Events",
+    "subheading": "Planned ceremonies and scheduled Bhavan usage",
     "viewAll": "View All Events",
     "items": [
       {
         "id": "evt-1",
-        "title": "Annual Village Festival 2026",
+        "title": "Marriage Ceremony",
         "date": "25 July 2026",
-        "time": "9:00 AM",
-        "location": "Gram Panchayat Ground",
-        "description": "Our village's annual festival — cultural programs, sports competitions, and prize distribution.",
-        "category": "Festival"
+        "time": "6:00 PM",
+        "location": "Society Bhavan Main Hall",
+        "description": "Approved marriage booking with area allocation and parking management.",
+        "category": "Marriage"
       },
       {
         "id": "evt-2",
-        "title": "Free Health Camp",
+        "title": "Shraddha Paksh Ritual",
         "date": "18 July 2026",
-        "time": "8 AM – 2 PM",
-        "location": "Primary Health Centre",
-        "description": "Free health check-up, medicines, and specialist consultation for all citizens.",
-        "category": "Health"
+        "time": "8:00 AM",
+        "location": "Designated Society Bhavan Area",
+        "description": "Religious booking with kitchen coordination and committee oversight.",
+        "category": "Religious"
       },
       {
         "id": "evt-3",
-        "title": "Youth Sports Competition",
+        "title": "Birthday Celebration",
         "date": "20 July 2026",
-        "time": "4:00 PM",
-        "location": "Sports Ground",
-        "description": "Cricket, Kabaddi, and wrestling competitions for youth aged 15–25.",
-        "category": "Sports"
+        "time": "7:00 PM",
+        "location": "Drawing Room / Terrace",
+        "description": "Evening-slot booking with availability-engine based area assignment.",
+        "category": "Celebration"
       }
     ]
   }

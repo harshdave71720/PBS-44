@@ -58,6 +58,8 @@ export interface Dictionary {
       badge: string
       heading: string
       subheading: string
+      registration?: string
+      description?: string
       ctaPrimary: string
       ctaSecondary: string
     }

@@ -1,11 +1,16 @@
 export const siteConfig = {
-  name: "जनसेवा पोर्टल",
-  nameEn: "Jan Seva Portal",
-  tagline: "एकता • सेवा • प्रगति",
-  taglineEn: "Unity • Service • Progress",
+  name: "श्री पालीवाल ब्राह्मण समाज पंचायत 44 श्रेणी ( रजि. ), इंदौर",
+  nameEn: "Shri Paliwal Brahman Samaj Panchayat 44 Shreni (Regd.), Indore",
+  shortName: "PBS-44 समाज भवन",
+  shortNameEn: "PBS-44 Bhavan",
+  tagline: "जय चारभुजा री",
+  taglineEn: "Jai Charbhuja Ri",
+  registrationNumber: "03/27/03/08161/31-12-04",
   description:
-    "भारतीय समाज की सेवा में समर्पित — एक डिजिटल पोर्टल जो समुदाय को जोड़ता है।",
-  url: "https://jansevaportal.in",
+    "समाज भवन बुकिंग, क्षेत्र आवंटन, समिति अनुमोदन एवं भुगतान सत्यापन हेतु आधिकारिक पोर्टल।",
+  descriptionEn:
+    "Official portal for Bhavan booking, area allocation, committee approval, and payment verification.",
+  url: "https://pbs44.in",
   ogImage: "/og.jpg",
   links: {
     facebook: "https://facebook.com",
@@ -13,9 +18,9 @@ export const siteConfig = {
     youtube: "https://youtube.com",
   },
   contact: {
-    address: "ग्राम पंचायत भवन, मुख्य बाजार, जनपद - 000001",
-    phone: "+91-XXXXX-XXXXX",
-    email: "info@jansevaportal.in",
-    officeHours: "सोमवार–शुक्रवार: प्रातः 10 बजे – सायं 5 बजे",
+    address: "42, जूना तुकोगंज,\nमहाराणा प्रताप मार्ग,\nइंदौर (म.प्र.)",
+    phone: "+91-731-0000000",
+    email: "booking@pbs44.in",
+    officeHours: "सोमवार–शनिवार: प्रातः 10 बजे – सायं 6 बजे",
   },
 } as const

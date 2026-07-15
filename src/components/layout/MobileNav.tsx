@@ -96,7 +96,7 @@ export function MobileNav({ items, cta, siteName }: MobileNavProps) {
         {/* CTA */}
         <div className="px-4 pb-6 mt-auto">
           <Link
-            href="/services"
+            href="/booking"
             onClick={() => setOpen(false)}
             className={cn(
               buttonVariants(),

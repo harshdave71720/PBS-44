@@ -51,11 +51,19 @@ export function HeroSection({ hero }: HeroSectionProps) {
           <p className="mb-10 text-base text-primary-foreground/80 sm:text-lg leading-relaxed max-w-2xl mx-auto">
             {hero.subheading}
           </p>
+          {hero.registration ? (
+            <p className="mb-4 text-sm text-accent font-medium">{hero.registration}</p>
+          ) : null}
+          {hero.description ? (
+            <p className="mb-10 text-base text-primary-foreground/80 sm:text-lg leading-relaxed max-w-2xl mx-auto">
+              {hero.description}
+            </p>
+          ) : null}
 
           {/* CTAs */}
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
-              href="/services"
+              href="/booking"
               className={cn(
                 buttonVariants({ size: "lg" }),
                 "bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-base px-8 shadow-lg shadow-accent/25"
@@ -78,10 +86,10 @@ export function HeroSection({ hero }: HeroSectionProps) {
           {/* Trust indicators */}
           <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[
-              { value: "50,000+", label: "परिवार" },
-              { value: "25+", label: "सेवाएं" },
-              { value: "15 वर्ष", label: "अनुभव" },
-              { value: "99%", label: "संतुष्टि" },
+              { value: "44", label: "श्रेणी समाज" },
+              { value: "2", label: "मुख्य स्लॉट" },
+              { value: "समिति", label: "अनुमोदन प्रक्रिया" },
+              { value: "100%", label: "बुकिंग ट्रैकिंग" },
             ].map(({ value, label }) => (
               <div
                 key={label}

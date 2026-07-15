@@ -1,20 +1,20 @@
 {
-  "cta": "आवेदन करें",
+  "cta": "भवन बुकिंग करें",
   "items": [
-    { "label": "होम", "href": "/" },
+    { "label": "मुखपृष्ठ", "href": "/" },
     {
-      "label": "सेवाएं",
-      "href": "/services",
+      "label": "बुकिंग",
+      "href": "/booking",
       "children": [
-        { "label": "प्रमाण पत्र", "href": "/services/certificates" },
-        { "label": "भूमि अभिलेख", "href": "/services/land-records" },
-        { "label": "शिकायत निवारण", "href": "/services/grievance" }
+        { "label": "नया बुकिंग आवेदन", "href": "/booking" },
+        { "label": "उपलब्धता जांच", "href": "/booking" },
+        { "label": "क्षेत्र आवंटन मार्गदर्शिका", "href": "/booking" }
       ]
     },
     { "label": "घोषणाएं", "href": "/announcements" },
-    { "label": "आयोजन", "href": "/events" },
-    { "label": "गैलरी", "href": "/gallery" },
-    { "label": "हमारे बारे में", "href": "/about" },
+    { "label": "समारोह", "href": "/events" },
+    { "label": "बुकिंग स्थिति", "href": "/booking" },
+    { "label": "समाज परिचय", "href": "/about" },
     { "label": "संपर्क", "href": "/contact" }
   ]
 }

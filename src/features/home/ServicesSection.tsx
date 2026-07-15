@@ -65,7 +65,7 @@ export function ServicesSection({ services }: ServicesSectionProps) {
                     href={service.href}
                     className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-accent transition-colors"
                   >
-                    आवेदन करें
+                    बुकिंग करें
                     <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                 </CardContent>
@@ -76,10 +76,10 @@ export function ServicesSection({ services }: ServicesSectionProps) {
 
         <div className="mt-10 text-center">
           <Link
-            href="/services"
+            href="/booking"
             className={cn(buttonVariants(), "bg-primary text-primary-foreground hover:bg-primary/90")}
           >
-            सभी सेवाएं देखें
+            सभी बुकिंग विकल्प देखें
             <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </div>
