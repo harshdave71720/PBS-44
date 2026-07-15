@@ -38,9 +38,11 @@ export function Header({ nav }: HeaderProps) {
 
         {/* Desktop nav */}
         <nav className="hidden lg:flex items-center gap-1" aria-label="मुख्य नेविगेशन">
-          {nav.items.map((item) =>
+          {nav.items.map((item) => {
+            const itemKey = `${item.href}-${item.label}`
+            return (
             item.children ? (
-              <DropdownMenu key={item.href}>
+              <DropdownMenu key={itemKey}>
                 <DropdownMenuTrigger
                   className={cn(
                     buttonVariants({ variant: "ghost", size: "sm" }),
@@ -56,7 +58,7 @@ export function Header({ nav }: HeaderProps) {
                 >
                   {item.children.map((child) => (
                     <DropdownMenuItem
-                      key={child.href}
+                      key={`${item.href}-${child.href}-${child.label}`}
                       render={<Link href={child.href} />}
                     >
                       {child.label}
@@ -66,7 +68,7 @@ export function Header({ nav }: HeaderProps) {
               </DropdownMenu>
             ) : (
               <Link
-                key={item.href}
+                key={itemKey}
                 href={item.href}
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "sm" }),
@@ -76,7 +78,7 @@ export function Header({ nav }: HeaderProps) {
                 {item.label}
               </Link>
             )
-          )}
+          )})}
         </nav>
 
         {/* CTA + mobile menu */}

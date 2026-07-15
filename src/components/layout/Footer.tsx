@@ -71,7 +71,7 @@ export function Footer({ navItems, common }: FooterProps) {
             </h4>
             <ul className="space-y-2">
               {navItems.slice(0, 6).map((item) => (
-                <li key={item.href}>
+                <li key={`${item.href}-${item.label}`}>
                   <Link
                     href={item.href}
                     className="text-sm text-primary-foreground/80 hover:text-accent transition-colors flex items-center gap-1"
@@ -98,7 +98,7 @@ export function Footer({ navItems, common }: FooterProps) {
                 { label: "भुगतान सत्यापन ट्रैकिंग", href: "/booking" },
                 { label: "बुकिंग जीवनचक्र स्थिति", href: "/booking" },
               ].map((item) => (
-                <li key={item.href}>
+                <li key={`${item.href}-${item.label}`}>
                   <Link
                     href={item.href}
                     className="text-sm text-primary-foreground/80 hover:text-accent transition-colors flex items-center gap-1"

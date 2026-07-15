@@ -11,9 +11,9 @@
         { "label": "Area Allocation Guide", "href": "/booking" }
       ]
     },
+    { "label": "Executive Committee", "href": "/executive-committee" },
     { "label": "Announcements", "href": "/announcements" },
-    { "label": "Ceremonies", "href": "/events" },
-    { "label": "Booking Status", "href": "/booking" },
+    { "label": "Society Bhavan", "href": "/events" },
     { "label": "About Society", "href": "/about" },
     { "label": "Contact", "href": "/contact" }
   ]

@@ -48,28 +48,30 @@ export function MobileNav({ items, cta, siteName }: MobileNavProps) {
 
         {/* Nav items */}
         <nav className="flex flex-col py-4">
-          {items.map((item) => (
-            <div key={item.href}>
+          {items.map((item) => {
+            const itemKey = `${item.href}-${item.label}`
+            return (
+            <div key={itemKey}>
               {item.children ? (
                 <>
                   <button
                     className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium hover:bg-white/10 transition-colors"
                     onClick={() =>
-                      setExpandedItem(expandedItem === item.href ? null : item.href)
+                      setExpandedItem(expandedItem === itemKey ? null : itemKey)
                     }
                   >
                     <span>{item.label}</span>
                     <ChevronDown
                       className={`h-4 w-4 transition-transform ${
-                        expandedItem === item.href ? "rotate-180" : ""
+                        expandedItem === itemKey ? "rotate-180" : ""
                       }`}
                     />
                   </button>
-                  {expandedItem === item.href && (
+                  {expandedItem === itemKey && (
                     <div className="border-l-2 border-accent ml-4 mb-1">
                       {item.children.map((child) => (
                         <Link
-                          key={child.href}
+                          key={`${item.href}-${child.href}-${child.label}`}
                           href={child.href}
                           onClick={() => setOpen(false)}
                           className="block px-4 py-2 text-sm text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 transition-colors"
@@ -90,7 +92,7 @@ export function MobileNav({ items, cta, siteName }: MobileNavProps) {
                 </Link>
               )}
             </div>
-          ))}
+          )})}
         </nav>
 
         {/* CTA */}

@@ -11,9 +11,9 @@
         { "label": "क्षेत्र आवंटन मार्गदर्शिका", "href": "/booking" }
       ]
     },
+    { "label": "प्रबंध कार्यकारिणी", "href": "/executive-committee" },
     { "label": "घोषणाएं", "href": "/announcements" },
-    { "label": "समारोह", "href": "/events" },
-    { "label": "बुकिंग स्थिति", "href": "/booking" },
+    { "label": "समाज भवन", "href": "/events" },
     { "label": "समाज परिचय", "href": "/about" },
     { "label": "संपर्क", "href": "/contact" }
   ]
