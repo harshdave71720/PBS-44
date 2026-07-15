@@ -18,6 +18,15 @@ export {
   TimeSlotLabel,
   BookingStatusLabel,
   CommitteeRoleLabel,
+  LEGACY_TO_PBS44_STATUS_MAP,
+  // Booking status helpers
+  getCanonicalBookingStatus,
+  getAllowedTransitions,
+  isValidStatusTransition,
+  canApprove,
+  canReject,
+  isTerminalState,
+  validateStatusTransition,
 } from "./booking"
 
 export type {
@@ -37,4 +46,5 @@ export type {
   IPayment,
   IAuditLog,
   IBookingReport,
+  StatusTransitionValidation,
 } from "./booking"

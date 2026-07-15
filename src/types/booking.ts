@@ -93,25 +93,179 @@ export const TimeSlotLabel: Record<TimeSlot, string> = {
  * Booking status lifecycle
  */
 export enum BookingStatus {
+  REQUEST_RECEIVED = "request_received",
+  PENDING_REVIEW = "pending_review",
+  COORDINATION_REQUIRED = "coordination_required",
+  KITCHEN_COORDINATION_REQUIRED = "kitchen_coordination_required",
   PENDING = "pending",           // Initial request
   APPROVED = "approved",         // Approved by committee
   REJECTED = "rejected",         // Rejected by committee
   CONFIRMED = "confirmed",       // Booking confirmed
   PAYMENT_PENDING = "payment_pending",
+  PAYMENT_VERIFICATION = "payment_verification",
   PAYMENT_RECEIVED = "payment_received",
   COMPLETED = "completed",       // Event completed
   CANCELLED = "cancelled",       // Booking cancelled
 }
 
 export const BookingStatusLabel: Record<BookingStatus, string> = {
+  [BookingStatus.REQUEST_RECEIVED]: "अनुरोध प्राप्त",
+  [BookingStatus.PENDING_REVIEW]: "समीक्षा लंबित",
+  [BookingStatus.COORDINATION_REQUIRED]: "समन्वय आवश्यक",
+  [BookingStatus.KITCHEN_COORDINATION_REQUIRED]: "रसोई समन्वय आवश्यक",
   [BookingStatus.PENDING]: "प्रतीक्षमान",
   [BookingStatus.APPROVED]: "अनुमोदित",
   [BookingStatus.REJECTED]: "अस्वीकृत",
   [BookingStatus.CONFIRMED]: "पुष्टि की गई",
   [BookingStatus.PAYMENT_PENDING]: "भुगतान लंबित",
+  [BookingStatus.PAYMENT_VERIFICATION]: "भुगतान सत्यापन",
   [BookingStatus.PAYMENT_RECEIVED]: "भुगतान प्राप्त",
   [BookingStatus.COMPLETED]: "पूर्ण",
   [BookingStatus.CANCELLED]: "रद्द",
+}
+
+export const LEGACY_TO_PBS44_STATUS_MAP: Readonly<
+  Partial<Record<BookingStatus, BookingStatus>>
+> = {
+  [BookingStatus.PENDING]: BookingStatus.PENDING_REVIEW,
+  [BookingStatus.PAYMENT_RECEIVED]: BookingStatus.PAYMENT_VERIFICATION,
+}
+
+const BOOKING_STATUS_TRANSITION_MATRIX: Readonly<
+  Record<BookingStatus, readonly BookingStatus[]>
+> = {
+  [BookingStatus.REQUEST_RECEIVED]: [
+    BookingStatus.PENDING_REVIEW,
+    BookingStatus.CANCELLED,
+  ],
+  [BookingStatus.PENDING_REVIEW]: [
+    BookingStatus.COORDINATION_REQUIRED,
+    BookingStatus.KITCHEN_COORDINATION_REQUIRED,
+    BookingStatus.APPROVED,
+    BookingStatus.REJECTED,
+    BookingStatus.CANCELLED,
+  ],
+  [BookingStatus.COORDINATION_REQUIRED]: [
+    BookingStatus.PENDING_REVIEW,
+    BookingStatus.APPROVED,
+    BookingStatus.REJECTED,
+    BookingStatus.CANCELLED,
+  ],
+  [BookingStatus.KITCHEN_COORDINATION_REQUIRED]: [
+    BookingStatus.PENDING_REVIEW,
+    BookingStatus.APPROVED,
+    BookingStatus.REJECTED,
+    BookingStatus.CANCELLED,
+  ],
+  [BookingStatus.PENDING]: [
+    BookingStatus.PENDING_REVIEW,
+    BookingStatus.APPROVED,
+    BookingStatus.REJECTED,
+    BookingStatus.CANCELLED,
+  ],
+  [BookingStatus.APPROVED]: [
+    BookingStatus.PAYMENT_PENDING,
+    BookingStatus.CONFIRMED,
+    BookingStatus.CANCELLED,
+  ],
+  [BookingStatus.REJECTED]: [],
+  [BookingStatus.CONFIRMED]: [
+    BookingStatus.COMPLETED,
+    BookingStatus.CANCELLED,
+  ],
+  [BookingStatus.PAYMENT_PENDING]: [
+    BookingStatus.PAYMENT_VERIFICATION,
+    BookingStatus.CANCELLED,
+  ],
+  [BookingStatus.PAYMENT_VERIFICATION]: [
+    BookingStatus.CONFIRMED,
+    BookingStatus.REJECTED,
+    BookingStatus.PAYMENT_PENDING,
+    BookingStatus.CANCELLED,
+  ],
+  [BookingStatus.PAYMENT_RECEIVED]: [
+    BookingStatus.PAYMENT_VERIFICATION,
+    BookingStatus.CONFIRMED,
+  ],
+  [BookingStatus.COMPLETED]: [],
+  [BookingStatus.CANCELLED]: [],
+}
+
+const TERMINAL_BOOKING_STATUSES = new Set<BookingStatus>([
+  BookingStatus.REJECTED,
+  BookingStatus.CANCELLED,
+  BookingStatus.COMPLETED,
+])
+
+const APPROVABLE_BOOKING_STATUSES = new Set<BookingStatus>([
+  BookingStatus.PENDING_REVIEW,
+  BookingStatus.COORDINATION_REQUIRED,
+  BookingStatus.KITCHEN_COORDINATION_REQUIRED,
+  BookingStatus.PENDING,
+])
+
+const REJECTABLE_BOOKING_STATUSES = new Set<BookingStatus>([
+  BookingStatus.PENDING_REVIEW,
+  BookingStatus.COORDINATION_REQUIRED,
+  BookingStatus.KITCHEN_COORDINATION_REQUIRED,
+  BookingStatus.PAYMENT_VERIFICATION,
+  BookingStatus.PENDING,
+])
+
+export interface StatusTransitionValidation {
+  from: BookingStatus
+  to: BookingStatus
+  valid: boolean
+  allowedTransitions: readonly BookingStatus[]
+  reason: string
+}
+
+export function getCanonicalBookingStatus(status: BookingStatus): BookingStatus {
+  return LEGACY_TO_PBS44_STATUS_MAP[status] ?? status
+}
+
+export function getAllowedTransitions(
+  status: BookingStatus
+): readonly BookingStatus[] {
+  return BOOKING_STATUS_TRANSITION_MATRIX[status]
+}
+
+export function isValidStatusTransition(
+  from: BookingStatus,
+  to: BookingStatus
+): boolean {
+  return getAllowedTransitions(from).includes(to)
+}
+
+export function canApprove(status: BookingStatus): boolean {
+  return APPROVABLE_BOOKING_STATUSES.has(status)
+}
+
+export function canReject(status: BookingStatus): boolean {
+  return REJECTABLE_BOOKING_STATUSES.has(status)
+}
+
+export function isTerminalState(status: BookingStatus): boolean {
+  return TERMINAL_BOOKING_STATUSES.has(status)
+}
+
+export function validateStatusTransition(
+  from: BookingStatus,
+  to: BookingStatus
+): StatusTransitionValidation {
+  const allowedTransitions = getAllowedTransitions(from)
+  const valid = allowedTransitions.includes(to)
+  const reason = valid
+    ? "Transition is allowed"
+    : `Invalid transition: ${from} -> ${to}. Allowed transitions: ${allowedTransitions.join(", ") || "none"}`
+
+  return {
+    from,
+    to,
+    valid,
+    allowedTransitions,
+    reason,
+  }
 }
 
 /**
