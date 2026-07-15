@@ -1,9 +1,8 @@
 {
   "cta": "Book Bhavan",
   "items": [
-    { "label": "Home", "href": "/" },
     {
-      "label": "Booking",
+      "label": "Bhavan Booking",
       "href": "/booking",
       "children": [
         { "label": "New Booking Request", "href": "/booking" },
@@ -11,10 +10,9 @@
         { "label": "Area Allocation Guide", "href": "/booking" }
       ]
     },
+    { "label": "Samaj Constitution", "href": "/samaj-ka-vidhan" },
+    { "label": "Annual Festival", "href": "/varshik-utsav" },
     { "label": "Executive Committee", "href": "/executive-committee" },
-    { "label": "Announcements", "href": "/announcements" },
-    { "label": "Society Bhavan", "href": "/events" },
-    { "label": "About Society", "href": "/about" },
-    { "label": "Contact", "href": "/contact" }
+    { "label": "Contact", "href": "/sampark" }
   ]
 }

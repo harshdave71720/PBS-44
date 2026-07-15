@@ -1,9 +1,8 @@
 {
   "cta": "भवन बुकिंग करें",
   "items": [
-    { "label": "मुखपृष्ठ", "href": "/" },
     {
-      "label": "बुकिंग",
+      "label": "भवन बुकिंग",
       "href": "/booking",
       "children": [
         { "label": "नया बुकिंग आवेदन", "href": "/booking" },
@@ -11,10 +10,9 @@
         { "label": "क्षेत्र आवंटन मार्गदर्शिका", "href": "/booking" }
       ]
     },
+    { "label": "समाज का विधान", "href": "/samaj-ka-vidhan" },
+    { "label": "वार्षिक उत्सव", "href": "/varshik-utsav" },
     { "label": "प्रबंध कार्यकारिणी", "href": "/executive-committee" },
-    { "label": "घोषणाएं", "href": "/announcements" },
-    { "label": "समाज भवन", "href": "/events" },
-    { "label": "समाज परिचय", "href": "/about" },
-    { "label": "संपर्क", "href": "/contact" }
+    { "label": "संपर्क", "href": "/sampark" }
   ]
 }

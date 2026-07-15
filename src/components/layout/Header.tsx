@@ -1,5 +1,8 @@
+"use client"
+
 import Link from "next/link"
 import { ChevronDown } from "lucide-react"
+import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { MobileNav } from "@/components/layout/MobileNav"
@@ -17,10 +20,15 @@ interface HeaderProps {
 }
 
 export function Header({ nav }: HeaderProps) {
+  const pathname = usePathname()
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`)
+
   return (
     <header className="sticky top-0 z-50 w-full bg-primary text-primary-foreground shadow-md">
       {/* Top accent strip */}
-      <div className="h-1 w-full bg-gradient-to-r from-secondary via-accent to-secondary" />
+      <div className="h-1 w-full bg-gradient-to-r from-secondary via-accent to-secondary/80" />
 
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Logo */}
@@ -46,7 +54,8 @@ export function Header({ nav }: HeaderProps) {
                 <DropdownMenuTrigger
                   className={cn(
                     buttonVariants({ variant: "ghost", size: "sm" }),
-                    "text-primary-foreground hover:bg-white/10 hover:text-white gap-1 cursor-pointer"
+                    "text-primary-foreground hover:bg-secondary/25 hover:text-secondary gap-1 cursor-pointer border-b-2 border-transparent rounded-none px-3",
+                    isActive(item.href) && "border-secondary text-secondary"
                   )}
                 >
                   {item.label}
@@ -72,7 +81,8 @@ export function Header({ nav }: HeaderProps) {
                 href={item.href}
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "sm" }),
-                  "text-primary-foreground hover:bg-white/10 hover:text-white"
+                  "text-primary-foreground hover:bg-secondary/25 hover:text-secondary border-b-2 border-transparent rounded-none px-3",
+                  isActive(item.href) && "border-secondary text-secondary"
                 )}
               >
                 {item.label}

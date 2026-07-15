@@ -23,7 +23,7 @@ export function MobileNav({ items, cta, siteName }: MobileNavProps) {
       <SheetTrigger
         className={cn(
           buttonVariants({ variant: "ghost", size: "icon" }),
-          "text-primary-foreground hover:bg-white/10 lg:hidden"
+          "text-primary-foreground hover:bg-secondary/25 lg:hidden"
         )}
         aria-label="मेनू खोलें"
       >
@@ -32,13 +32,13 @@ export function MobileNav({ items, cta, siteName }: MobileNavProps) {
       <SheetContent side="left" className="w-[300px] bg-primary p-0 text-primary-foreground">
         <SheetTitle className="sr-only">{siteName} — नेविगेशन</SheetTitle>
         {/* Sheet header */}
-        <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
+        <div className="flex items-center justify-between border-b border-secondary/30 px-4 py-4">
           <span className="font-bold text-lg">{siteName}</span>
           <button
             onClick={() => setOpen(false)}
             className={cn(
               buttonVariants({ variant: "ghost", size: "icon" }),
-              "text-primary-foreground hover:bg-white/10"
+              "text-primary-foreground hover:bg-secondary/25"
             )}
             aria-label="बंद करें"
           >
@@ -55,7 +55,7 @@ export function MobileNav({ items, cta, siteName }: MobileNavProps) {
               {item.children ? (
                 <>
                   <button
-                    className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium hover:bg-white/10 transition-colors"
+                    className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium hover:bg-secondary/20 hover:text-secondary transition-colors"
                     onClick={() =>
                       setExpandedItem(expandedItem === itemKey ? null : itemKey)
                     }
@@ -74,7 +74,7 @@ export function MobileNav({ items, cta, siteName }: MobileNavProps) {
                           key={`${item.href}-${child.href}-${child.label}`}
                           href={child.href}
                           onClick={() => setOpen(false)}
-                          className="block px-4 py-2 text-sm text-primary-foreground/80 hover:text-primary-foreground hover:bg-white/10 transition-colors"
+                          className="block px-4 py-2 text-sm text-primary-foreground/85 hover:text-secondary hover:bg-secondary/20 transition-colors"
                         >
                           {child.label}
                         </Link>
@@ -86,7 +86,7 @@ export function MobileNav({ items, cta, siteName }: MobileNavProps) {
                 <Link
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="block px-4 py-3 text-sm font-medium hover:bg-white/10 transition-colors"
+                  className="block px-4 py-3 text-sm font-medium hover:bg-secondary/20 hover:text-secondary transition-colors"
                 >
                   {item.label}
                 </Link>
@@ -102,7 +102,7 @@ export function MobileNav({ items, cta, siteName }: MobileNavProps) {
             onClick={() => setOpen(false)}
             className={cn(
               buttonVariants(),
-              "w-full bg-accent text-accent-foreground hover:bg-accent/90 justify-center"
+              "w-full justify-center"
             )}
           >
             {cta}

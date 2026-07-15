@@ -15,11 +15,11 @@ export function ExecutiveCommitteeCard({
   return (
     <article
       className={[
-        "group rounded-2xl border bg-white transition-all duration-200",
-        "shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(0,0,0,0.14)]",
+        "group rounded-2xl border bg-[#FFFAF0] transition-all duration-200",
+        "shadow-[0_8px_24px_rgba(60,42,33,0.10)] hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(60,42,33,0.16)]",
         highlighted
-          ? "border-[#C8A24A]/70 p-6"
-          : "border-[#7F0000]/15 p-4",
+          ? "border-[#DEC484]/80 p-6"
+          : "border-[#D7C6A0] p-4",
       ].join(" ")}
     >
       <ExecutiveCommitteeImage
@@ -31,10 +31,7 @@ export function ExecutiveCommitteeCard({
       <div className="mt-4 space-y-2 text-center">
         <span
           className={[
-            "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-wide",
-            highlighted
-              ? "bg-[#7F0000] text-white"
-              : "bg-[#C8A24A]/20 text-[#7F0000]",
+            "inline-flex items-center rounded-full border border-[#D7C6A0] bg-[#DEC484] px-3 py-1 text-xs font-semibold tracking-wide text-[#7F0000]",
           ].join(" ")}
         >
           {member.designation}
@@ -52,4 +49,3 @@ export function ExecutiveCommitteeCard({
     </article>
   )
 }
-

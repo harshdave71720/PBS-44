@@ -20,7 +20,7 @@ export function ExecutiveCommitteeImage({
   const [src, setSrc] = useState(initialSrc)
 
   return (
-    <div className="relative mx-auto h-36 w-36 overflow-hidden rounded-full border-4 border-[#C8A24A]/40 bg-[#FFF9EF] shadow-md">
+    <div className="relative mx-auto h-36 w-36 overflow-hidden rounded-full border-4 border-[#DEC484]/70 bg-[#F8F3E8] shadow-[0_8px_20px_rgba(60,42,33,0.12)]">
       <Image
         src={src}
         alt={name}
@@ -37,4 +37,3 @@ export function ExecutiveCommitteeImage({
     </div>
   )
 }
-

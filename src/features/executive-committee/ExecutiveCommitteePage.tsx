@@ -6,17 +6,17 @@ import { ExecutiveCommitteeCard } from "@/features/executive-committee/Executive
 
 export function ExecutiveCommitteePage() {
   return (
-    <section className="bg-[#FFF9EF] py-10 sm:py-14">
+    <section className="bg-[#F8F3E8] py-10 sm:py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <header className="rounded-2xl border border-[#C8A24A]/40 bg-white p-6 shadow-[0_10px_30px_rgba(127,0,0,0.08)] sm:p-8">
+        <header className="rounded-2xl border border-[#D7C6A0] bg-[#FFFAF0] p-6 shadow-[0_10px_30px_rgba(60,42,33,0.10)] sm:p-8">
           <h1 className="text-3xl font-bold text-[#7F0000] sm:text-4xl">प्रबंध कार्यकारिणी</h1>
-          <p className="mt-3 text-base font-medium text-[#5A1010] sm:text-lg">
+          <p className="mt-3 text-base font-medium text-[#3C2A21] sm:text-lg">
             श्री पालीवाल ब्राह्मण समाज पंचायत 44 श्रेणी ( रजि. ), इंदौर
           </p>
           <p className="mt-2 text-sm text-[#7F0000]">
             पंजीयन क्रमांक : <span className="font-semibold">03/27/03/08161/31-12-04</span>
           </p>
-          <p className="mt-3 whitespace-pre-line text-sm text-[#5A1010]">
+          <p className="mt-3 whitespace-pre-line text-sm text-[#3C2A21]">
             42, जूना तुकोगंज,{"\n"}महाराणा प्रताप मार्ग,{"\n"}इंदौर (म.प्र.)
           </p>
         </header>
@@ -25,7 +25,7 @@ export function ExecutiveCommitteePage() {
           <section>
             <div className="mb-5 flex items-center justify-between gap-3">
               <h2 className="text-2xl font-bold text-[#7F0000]">प्रबंध कार्यकारिणी</h2>
-              <span className="rounded-full bg-[#7F0000] px-3 py-1 text-xs font-semibold text-white">
+              <span className="rounded-full border border-[#D7C6A0] bg-[#DEC484] px-3 py-1 text-xs font-semibold text-[#7F0000]">
                 पदाधिकारी
               </span>
             </div>
@@ -44,7 +44,7 @@ export function ExecutiveCommitteePage() {
           <section>
             <div className="mb-5 flex items-center justify-between gap-3">
               <h2 className="text-2xl font-bold text-[#7F0000]">कार्यकारिणी सदस्य</h2>
-              <span className="rounded-full bg-[#C8A24A]/30 px-3 py-1 text-xs font-semibold text-[#7F0000]">
+              <span className="rounded-full border border-[#D7C6A0] bg-[#E2D8A5] px-3 py-1 text-xs font-semibold text-[#7F0000]">
                 सदस्य
               </span>
             </div>
@@ -63,4 +63,3 @@ export function ExecutiveCommitteePage() {
     </section>
   )
 }
-

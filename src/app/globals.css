@@ -61,51 +61,46 @@
 }
 
 :root {
-  /* ── Brand colours ── */
-  /* Primary  #1F4E79  deep navy blue  */
-  /* Secondary #7F0000  dark crimson   */
-  /* Accent    #C55A11  saffron-orange */
+  --background: #f8f3e8;
+  --foreground: #3c2a21;
+  --card: #fffaf0;
+  --card-foreground: #3c2a21;
+  --popover: #fffaf0;
+  --popover-foreground: #3c2a21;
 
-  --background: oklch(0.99 0.004 80);
-  --foreground: oklch(0.18 0.015 260);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.015 260);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.015 260);
+  --primary: #7f0000;
+  --primary-foreground: #f8f3e8;
 
-  --primary: oklch(0.351 0.090 243.6);
-  --primary-foreground: oklch(0.985 0 0);
+  --secondary: #dec484;
+  --secondary-foreground: #3c2a21;
 
-  --secondary: oklch(0.298 0.141 25.1);
-  --secondary-foreground: oklch(0.985 0 0);
+  --muted: #efe5cf;
+  --muted-foreground: #5a4338;
 
-  --muted: oklch(0.96 0.006 80);
-  --muted-foreground: oklch(0.50 0.02 260);
-
-  --accent: oklch(0.578 0.142 47.3);
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: #e2d8a5;
+  --accent-foreground: #7f0000;
 
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.90 0.008 80);
-  --input: oklch(0.90 0.008 80);
-  --ring: oklch(0.351 0.090 243.6);
+  --border: #d7c6a0;
+  --input: #d7c6a0;
+  --ring: #7f0000;
 
-  --chart-1: oklch(0.351 0.090 243.6);
-  --chart-2: oklch(0.298 0.141 25.1);
-  --chart-3: oklch(0.578 0.142 47.3);
-  --chart-4: oklch(0.55 0.12 140);
-  --chart-5: oklch(0.65 0.10 310);
+  --chart-1: #7f0000;
+  --chart-2: #dec484;
+  --chart-3: #e2d8a5;
+  --chart-4: #9a6a42;
+  --chart-5: #6b4a34;
 
   --radius: 0.5rem;
 
-  --sidebar: oklch(0.351 0.090 243.6);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.578 0.142 47.3);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.30 0.07 243.6);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.30 0.07 243.6);
-  --sidebar-ring: oklch(0.578 0.142 47.3);
+  --sidebar: #7f0000;
+  --sidebar-foreground: #f8f3e8;
+  --sidebar-primary: #dec484;
+  --sidebar-primary-foreground: #3c2a21;
+  --sidebar-accent: #e2d8a5;
+  --sidebar-accent-foreground: #7f0000;
+  --sidebar-border: #d7c6a0;
+  --sidebar-ring: #dec484;
 }
 
 .dark {
@@ -148,6 +143,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    letter-spacing: 0.01em;
   }
   html {
     @apply font-sans;
@@ -160,9 +156,9 @@
     border-image: linear-gradient(
         90deg,
         transparent 0%,
-        #c55a11 30%,
-        #1f4e79 50%,
-        #c55a11 70%,
+        #dec484 30%,
+        #7f0000 50%,
+        #dec484 70%,
         transparent 100%
       )
       1;
@@ -172,23 +168,23 @@
   .bg-pattern-mandala {
     background-image: radial-gradient(
         circle at 25% 25%,
-        oklch(0.351 0.090 243.6 / 0.06) 0%,
+        rgb(127 0 0 / 0.08) 0%,
         transparent 50%
       ),
       radial-gradient(
         circle at 75% 75%,
-        oklch(0.578 0.142 47.3 / 0.06) 0%,
+        rgb(222 196 132 / 0.12) 0%,
         transparent 50%
       );
   }
 
-  /* Saffron gradient for hero sections */
+  /* Traditional cream and maroon hero blend */
   .bg-hero-gradient {
     background: linear-gradient(
       135deg,
-      oklch(0.351 0.090 243.6) 0%,
-      oklch(0.28 0.08 243.6) 60%,
-      oklch(0.22 0.06 243.6) 100%
+      #f8f3e8 0%,
+      #f4e9d0 58%,
+      #e2d8a5 100%
     );
   }
 

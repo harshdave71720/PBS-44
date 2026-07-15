@@ -24,7 +24,7 @@ export function AboutSection({ about }: AboutSectionProps) {
 
             <div className="space-y-4">
               {about.description.map((para, i) => (
-                <p key={i} className="text-muted-foreground leading-relaxed">
+                <p key={i} className="text-foreground leading-relaxed">
                   {para}
                 </p>
               ))}
@@ -39,15 +39,15 @@ export function AboutSection({ about }: AboutSectionProps) {
                 "समिति अनुमोदन और भुगतान सत्यापन प्रवाह",
               ].map((point) => (
                 <li key={point} className="flex items-start gap-2.5">
-                  <CheckCircle2 className="h-5 w-5 shrink-0 text-accent mt-0.5" />
-                  <span className="text-sm text-muted-foreground">{point}</span>
+                  <CheckCircle2 className="h-5 w-5 shrink-0 text-primary mt-0.5" />
+                  <span className="text-sm text-foreground">{point}</span>
                 </li>
               ))}
             </ul>
 
             <Link
               href="/about"
-              className={cn(buttonVariants(), "bg-primary text-primary-foreground hover:bg-primary/90 mt-2")}
+              className={cn(buttonVariants(), "mt-2")}
             >
               {about.cta}
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -56,23 +56,15 @@ export function AboutSection({ about }: AboutSectionProps) {
 
           {/* Stats grid */}
           <div className="grid grid-cols-2 gap-4">
-            {about.stats.map((stat, idx) => {
-              const bgColors = [
-                "bg-primary text-primary-foreground",
-                "bg-secondary text-secondary-foreground",
-                "bg-accent text-accent-foreground",
-                "bg-primary/80 text-primary-foreground",
-              ]
-              return (
-                <div
-                  key={stat.label}
-                  className={`flex flex-col items-center justify-center rounded-2xl p-8 text-center ${bgColors[idx % bgColors.length]}`}
-                >
-                  <span className="text-4xl font-bold">{stat.value}</span>
-                  <span className="mt-2 text-sm font-medium opacity-90">{stat.label}</span>
-                </div>
-              )
-            })}
+          {about.stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="flex flex-col items-center justify-center rounded-2xl border border-secondary/75 bg-[#F8F3E8] p-8 text-center shadow-[0_8px_20px_rgba(60,42,33,0.08)]"
+            >
+              <span className="text-4xl font-bold text-primary">{stat.value}</span>
+              <span className="mt-2 text-sm font-medium text-foreground">{stat.label}</span>
+            </div>
+          ))}
           </div>
         </div>
       </div>
