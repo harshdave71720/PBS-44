@@ -165,6 +165,13 @@ export function Footer({ navItems, common }: FooterProps) {
             </Link>
           </div>
         </div>
+
+        <div className="mt-3 text-center text-[11px] text-primary-foreground/55 space-y-1">
+          <p>{common.designedAndDevelopedBy}</p>
+          <p>{common.developerOne}</p>
+          <p>{common.and}</p>
+          <p>{common.developerTwo}</p>
+        </div>
       </div>
     </footer>
   )

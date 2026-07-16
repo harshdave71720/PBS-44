@@ -44,7 +44,7 @@ export const CONTACT_DIRECTORY: ContactDirectoryEntry[] = [
   },
   {
     srNo: 5,
-    name: "श्री ओमप्रकाश राजूलालजी देव",
+    name: "श्री ओमप्रकाश राजूलालजी दवे",
     designation: "कोषमंत्री",
     village: "ब्राह्मण टूकड़ा",
     mobile: "98266-45655",
@@ -60,7 +60,7 @@ export const CONTACT_DIRECTORY: ContactDirectoryEntry[] = [
   },
   {
     srNo: 7,
-    name: "श्री सुरेश भोलीरामजी देव",
+    name: "श्री सुरेश भोलीरामजी दवे",
     designation: "शिक्षा मंत्री",
     village: "ब्राह्मण टूकड़ा",
     mobile: "99772-13300",
@@ -84,7 +84,7 @@ export const CONTACT_DIRECTORY: ContactDirectoryEntry[] = [
   },
   {
     srNo: 1,
-    name: "श्री रमेश भंवरलाल जी देव",
+    name: "श्री रमेश भंवरलाल जी दवे",
     designation: "सदस्य",
     village: "ब्राह्मण टूकड़ा",
     mobile: "98275-92756",
