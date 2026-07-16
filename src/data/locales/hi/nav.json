@@ -1,15 +1,6 @@
 {
-  "cta": "भवन बुकिंग करें",
+  "cta": "भवन उपलब्धता",
   "items": [
-    {
-      "label": "भवन बुकिंग",
-      "href": "/booking",
-      "children": [
-        { "label": "नया बुकिंग आवेदन", "href": "/booking" },
-        { "label": "उपलब्धता जांच", "href": "/booking" },
-        { "label": "क्षेत्र आवंटन मार्गदर्शिका", "href": "/booking" }
-      ]
-    },
     { "label": "समाज का विधान", "href": "/samaj-ka-vidhan" },
     { "label": "वार्षिक उत्सव", "href": "/varshik-utsav" },
     { "label": "प्रबंध कार्यकारिणी", "href": "/executive-committee" },

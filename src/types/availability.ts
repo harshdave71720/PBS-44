@@ -7,6 +7,10 @@
  */
 export enum AvailabilityStatus {
   AVAILABLE = "AVAILABLE",
+  PHONE_RESERVATION = "PHONE_RESERVATION",
+  HALF_BHAVAN = "HALF_BHAVAN",
+  FULL_BHAVAN = "FULL_BHAVAN",
+  SOCIETY_EVENT = "SOCIETY_EVENT",
   PARTIALLY_AVAILABLE = "PARTIALLY_AVAILABLE",
   KITCHEN_COORDINATION_REQUIRED = "KITCHEN_COORDINATION_REQUIRED",
   CONFLICT_REVIEW_REQUIRED = "CONFLICT_REVIEW_REQUIRED",
@@ -116,4 +120,29 @@ export enum TimeSlotCompatibility {
   EXCLUSIVE = "EXCLUSIVE", // No other bookings allowed
   SHAREABLE = "SHAREABLE", // Multiple events can share
   COORDINATED = "COORDINATED", // Requires special coordination
+}
+
+export interface AvailabilityRecord {
+  id: string
+  bhavanType: BhavanType
+  date: string
+  status: AvailabilityStatus
+  eventName: string
+  remarks: string
+}
+
+export enum BhavanType {
+  MAIN_BHAVAN = "MAIN_BHAVAN",
+  DEVPURI_BHAVAN = "DEVPURI_BHAVAN",
+  GOVIND_COLONY_BHAVAN = "GOVIND_COLONY_BHAVAN",
+}
+
+export interface MonthAvailabilityQuery {
+  bhavanType: BhavanType
+  year: number
+  month: number
+}
+
+export interface AvailabilityRepository {
+  getMonthAvailability(query: MonthAvailabilityQuery): Promise<AvailabilityRecord[]>
 }
