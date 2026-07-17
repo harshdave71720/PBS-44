@@ -65,19 +65,16 @@ function getResourceRequirement(
   eventType: ApplicantBookingFormValues["eventCode"],
   foodRequired: ApplicantBookingFormValues["foodRequired"]
 ): string {
-  if (eventType === "sooraj_pooja") {
-    return foodRequired === "yes" ? "आधा भवन" : "व्यक्तिगत हॉल"
+  switch (eventType) {
+    case "sooraj_pooja":
+      return foodRequired === "yes" ? "आधा भवन" : "व्यक्तिगत हॉल"
+    case "vivah":
+      return "पूर्ण भवन"
+    case "samaj_karyakram":
+      return "सम्पूर्ण भवन"
+    default:
+      return foodRequired === "yes" ? "आधा भवन" : "व्यक्तिगत हॉल"
   }
-  if (eventType === "vivah") {
-    return "पूर्ण भवन"
-  }
-  if (eventType === "samaj_karyakram") {
-    return "सम्पूर्ण भवन"
-  }
-  if (eventType === "sagai") {
-    return "आधा भवन"
-  }
-  return foodRequired === "yes" ? "आधा भवन" : "व्यक्तिगत हॉल"
 }
 
 function getDuration(eventType: ApplicantBookingFormValues["eventCode"]): string {
@@ -85,6 +82,13 @@ function getDuration(eventType: ApplicantBookingFormValues["eventCode"]): string
     return "पूरा दिन"
   }
   return "आधा दिन"
+}
+
+function getTimeSlotDisplay(eventType: ApplicantBookingFormValues["eventCode"]): string {
+  if (eventType === "vivah" || eventType === "samaj_karyakram") {
+    return "पूरा दिन"
+  }
+  return "सुबह / शाम"
 }
 
 function toAvailabilityViewStatus(status: AvailabilityStatus): AvailabilityViewStatus {
@@ -175,10 +179,17 @@ export function ApplicantBookingForm() {
   const availabilityDisplay = getAvailabilityDisplay(availabilityStatus)
   const resourceRequired = getResourceRequirement(formValues.eventCode, formValues.foodRequired)
   const duration = getDuration(formValues.eventCode)
+  const timeSlotDisplay = getTimeSlotDisplay(formValues.eventCode)
   const selectedBhavanLabel =
     BHAVAN_OPTIONS.find((option) => option.value === formValues.bhavanType)?.label ?? "मुख्य धर्मशाला"
   const selectedEventLabel =
     EVENT_OPTIONS.find((option) => option.value === formValues.eventCode)?.label ?? "—"
+  const hasAnyPrimaryDetail = Boolean(
+    formValues.applicantName.trim() ||
+      formValues.mobile.trim() ||
+      formValues.eventDate.trim() ||
+      (formValues.memberType === "member" && (formValues.membershipNumber ?? "").trim())
+  )
 
   const handleFieldChange = <K extends keyof ApplicantBookingFormValues>(
     key: K,
@@ -289,7 +300,7 @@ export function ApplicantBookingForm() {
 
             {formValues.memberType === "member" ? (
               <div className="grid gap-2">
-                <label htmlFor="membershipNumber">सदस्यता क्रमांक</label>
+                <label htmlFor="membershipNumber">सदस्य क्रमांक</label>
                 <Input
                   id="membershipNumber"
                   value={formValues.membershipNumber ?? ""}
@@ -386,41 +397,68 @@ export function ApplicantBookingForm() {
       <div className="grid gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>इंटेलिजेंट सारांश</CardTitle>
-            <CardDescription>फॉर्म बदलते ही सारांश स्वतः अपडेट होता है।</CardDescription>
+            <CardTitle>लाइव बुकिंग इंटेलिजेंस</CardTitle>
+            <CardDescription>यह पैनल फॉर्म बदलते ही तुरंत अपडेट होता है।</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-2 text-sm">
-            <p>
-              <strong>धर्मशाला:</strong> {selectedBhavanLabel}
-            </p>
-            <p>
-              <strong>सदस्य प्रकार:</strong> {formValues.memberType === "member" ? "सदस्य" : "गैर सदस्य"}
-            </p>
-            <p>
-              <strong>कार्यक्रम प्रकार:</strong> {selectedEventLabel}
-            </p>
-            <p>
-              <strong>भोजन आवश्यक:</strong> {formValues.foodRequired === "yes" ? "हाँ" : "नहीं"}
-            </p>
-            <p>
-              <strong>संसाधन आवश्यकता:</strong> {resourceRequired}
-            </p>
-            <p>
-              <strong>अवधि:</strong> {duration}
-            </p>
-            <p className={cn("font-semibold", availabilityDisplay.className)}>
-              <strong className="text-foreground">उपलब्धता स्थिति:</strong> {availabilityDisplay.label}
-            </p>
-            {selectedDateRecord ? (
-              <>
-                <p>
-                  <strong>उपलब्धता रिकॉर्ड:</strong> {selectedDateRecord.eventName}
-                </p>
-                <p>
-                  <strong>टिप्पणी:</strong> {selectedDateRecord.remarks}
-                </p>
-              </>
+          <CardContent className="space-y-4 text-sm">
+            {!hasAnyPrimaryDetail ? (
+              <p className="rounded-lg border border-border bg-[#FFFDF7] px-3 py-3 text-muted-foreground">
+                कृपया विवरण भरें।
+              </p>
             ) : null}
+
+            <div className="rounded-lg border border-border bg-[#FFFDF7] p-3">
+              <h4 className="mb-2 text-sm font-semibold text-primary">मुख्य विवरण</h4>
+              <div className="grid gap-1.5">
+                <p>
+                  <strong>धर्मशाला:</strong> {selectedBhavanLabel}
+                </p>
+                <p>
+                  <strong>सदस्य प्रकार:</strong> {formValues.memberType === "member" ? "सदस्य" : "गैर सदस्य"}
+                </p>
+                <p>
+                  <strong>सदस्य क्रमांक:</strong>{" "}
+                  {formValues.memberType === "member" ? formValues.membershipNumber || "—" : "लागू नहीं"}
+                </p>
+                <p>
+                  <strong>कार्यक्रम:</strong> {selectedEventLabel}
+                </p>
+                <p>
+                  <strong>भोजन:</strong> {formValues.foodRequired === "yes" ? "हाँ" : "नहीं"}
+                </p>
+                <p>
+                  <strong>तिथि:</strong> {formValues.eventDate || "—"}
+                </p>
+                <p>
+                  <strong>समय स्लॉट:</strong> {timeSlotDisplay}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-border bg-[#FFFDF7] p-3">
+              <h4 className="mb-2 text-sm font-semibold text-primary">संसाधन एवं उपलब्धता</h4>
+              <div className="grid gap-1.5">
+                <p>
+                  <strong>अवधि:</strong> {duration}
+                </p>
+                <p>
+                  <strong>आवश्यक संसाधन:</strong> {resourceRequired}
+                </p>
+                <p className={cn("font-semibold", availabilityDisplay.className)}>
+                  <strong className="text-foreground">उपलब्धता स्थिति:</strong> {availabilityDisplay.label}
+                </p>
+                {selectedDateRecord ? (
+                  <>
+                    <p>
+                      <strong>रिकॉर्ड कार्यक्रम:</strong> {selectedDateRecord.eventName}
+                    </p>
+                    <p>
+                      <strong>रिकॉर्ड टिप्पणी:</strong> {selectedDateRecord.remarks}
+                    </p>
+                  </>
+                ) : null}
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -431,11 +469,10 @@ export function ApplicantBookingForm() {
           </CardHeader>
           <CardContent>
             <ul className="list-disc space-y-2 pl-5 text-sm text-foreground">
-              <li>सूरज पूजा में भोजन नहीं होने पर व्यक्तिगत हॉल आवंटित किया जाता है।</li>
-              <li>सूरज पूजा में भोजन होने पर आधा भवन आवश्यक माना जाता है।</li>
-              <li>विवाह हेतु पूर्ण भवन तथा समाज कार्यक्रम हेतु सम्पूर्ण भवन आवश्यक है।</li>
-              <li>सदस्य आवेदक के लिए सदस्यता क्रमांक देना अनिवार्य है।</li>
-              <li>बुकिंग हेतु पिछली तिथि चयनित नहीं की जा सकती।</li>
+              <li>सूरज पूजा बिना भोजन केवल हॉल हेतु मान्य है।</li>
+              <li>सूरज पूजा भोजन सहित होने पर न्यूनतम आधा भवन आवश्यक है।</li>
+              <li>समाज कार्यक्रमों हेतु प्राथमिकता समाज को दी जाएगी।</li>
+              <li>अंतिम स्वीकृति प्रबंधन समिति द्वारा की जाएगी।</li>
             </ul>
           </CardContent>
         </Card>
@@ -443,4 +480,3 @@ export function ApplicantBookingForm() {
     </div>
   )
 }
-
