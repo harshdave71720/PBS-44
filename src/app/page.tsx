@@ -1,6 +1,7 @@
 import { getDictionary } from "@/lib/i18n"
 import { defaultLocale } from "@/config/i18n"
 import { HeroSection } from "@/features/home/HeroSection"
+import { BookingActionsSection } from "@/features/home/BookingActionsSection"
 import { AnnouncementsSection } from "@/features/home/AnnouncementsSection"
 import { ServicesSection } from "@/features/home/ServicesSection"
 import { AboutSection } from "@/features/home/AboutSection"
@@ -19,6 +20,7 @@ export default function HomePage() {
   return (
     <>
       <HeroSection hero={dict.home.hero} />
+      <BookingActionsSection />
       <AnnouncementsSection announcements={dict.home.announcements} />
       <OrnamentalDivider className="mx-auto max-w-7xl px-4" />
       <ServicesSection services={dict.home.services} />
