@@ -4,8 +4,6 @@ export interface VarshikUtsavSection {
   content: string
 }
 
-const PLACEHOLDER_CONTENT = "विवरण शीघ्र उपलब्ध होगा"
-
 export const VARSHIK_UTSAV_SECTIONS: VarshikUtsavSection[] = [
   {
     id: 1,

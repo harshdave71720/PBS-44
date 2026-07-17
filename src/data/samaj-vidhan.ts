@@ -4,8 +4,6 @@ export interface SamajVidhanSection {
   content: string
 }
 
-const PLACEHOLDER_CONTENT = "विवरण शीघ्र उपलब्ध होगा"
-
 export const SAMAJ_VIDHAN_SECTIONS: SamajVidhanSection[] = [
   {
     id: 1,

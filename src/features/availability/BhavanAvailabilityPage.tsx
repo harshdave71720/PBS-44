@@ -103,11 +103,14 @@ function getDefaultRecord(date: string, bhavanType: BhavanType): AvailabilityRec
 }
 
 export function BhavanAvailabilityPage() {
-  const now = new Date()
+  const [currentYear] = useState(() => new Date().getFullYear())
   const [selectedBhavanType, setSelectedBhavanType] = useState<BhavanType>(BhavanType.MAIN_BHAVAN)
-  const [selectedMonthKey, setSelectedMonthKey] = useState(toMonthKey(now.getFullYear(), now.getMonth()))
+  const [selectedMonthKey, setSelectedMonthKey] = useState(() => {
+    const currentDate = new Date()
+    return toMonthKey(currentDate.getFullYear(), currentDate.getMonth())
+  })
   const [monthRecords, setMonthRecords] = useState<AvailabilityRecord[]>([])
-  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [selectedDateByMonth, setSelectedDateByMonth] = useState<Record<string, string>>({})
 
   const [selectedYear, selectedMonthIndex] = useMemo(() => {
     const [year, month] = selectedMonthKey.split("-").map(Number)
@@ -115,7 +118,6 @@ export function BhavanAvailabilityPage() {
   }, [selectedMonthKey])
 
   const monthOptions = useMemo(() => {
-    const currentYear = now.getFullYear()
     const years = [currentYear, currentYear + 1]
     return years.flatMap((year) =>
       MONTH_LABELS.map((monthLabel, monthIndex) => ({
@@ -123,7 +125,7 @@ export function BhavanAvailabilityPage() {
         label: `${monthLabel} ${year}`,
       }))
     )
-  }, [now])
+  }, [currentYear])
 
   useEffect(() => {
     let isMounted = true
@@ -169,14 +171,18 @@ export function BhavanAvailabilityPage() {
     return [...placeholders, ...dayCells]
   }, [daysInMonth, firstWeekday])
 
-  useEffect(() => {
+  const selectedDate = useMemo(() => {
+    const selectedFromState = selectedDateByMonth[selectedMonthKey]
+    if (selectedFromState) {
+      return selectedFromState
+    }
     const today = new Date()
     const initialDay =
       today.getFullYear() === selectedYear && today.getMonth() === selectedMonthIndex
         ? today.getDate()
         : 1
-    setSelectedDate(toIsoDate(selectedYear, selectedMonthIndex, initialDay))
-  }, [selectedYear, selectedMonthIndex])
+    return toIsoDate(selectedYear, selectedMonthIndex, initialDay)
+  }, [selectedDateByMonth, selectedMonthKey, selectedYear, selectedMonthIndex])
 
   const selectedRecord = useMemo(() => {
     if (!selectedDate) {
@@ -289,7 +295,12 @@ export function BhavanAvailabilityPage() {
                   <button
                     type="button"
                     key={cell.key}
-                    onClick={() => setSelectedDate(date)}
+                    onClick={() =>
+                      setSelectedDateByMonth((prev) => ({
+                        ...prev,
+                        [selectedMonthKey]: date,
+                      }))
+                    }
                     className={cn(
                       "flex h-20 flex-col items-center justify-center rounded-md border text-center transition-colors sm:h-24",
                       isSelected

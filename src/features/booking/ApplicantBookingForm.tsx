@@ -1,20 +1,13 @@
 "use client"
 
-import { useMemo, useState, type FormEvent } from "react"
-
-import { getAllEvents, getEventByCode } from "@/lib/events-master"
-import { getAreaByCode } from "@/lib/areas-master"
-import { checkAvailability } from "@/lib/availability-engine"
+import { useEffect, useMemo, useState, type FormEvent } from "react"
+import { availabilityRepository } from "@/data/availability"
 import {
-  AreaCode,
-  AreaCodeLabel,
-  BookingStatus,
-  type IBooking,
-  MemberType,
-  TimeSlot,
-  EventType,
-} from "@/types/booking"
-import type { BookingForAvailability } from "@/types/availability"
+  AvailabilityStatus,
+  BhavanType,
+  type AvailabilityRecord,
+} from "@/types/availability"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -38,122 +31,154 @@ import {
 } from "@/features/booking/schema"
 
 type FieldErrors = Partial<Record<keyof ApplicantBookingFormValues, string>>
+type AvailabilityViewStatus = "not_selected" | "available" | "partial" | "unavailable"
 
-interface BookingDraft {
-  booking: IBooking
-  availabilityStatus: string
-  suggestedAreas: string[]
-}
+const BHAVAN_OPTIONS: Array<{ value: BhavanType; label: string }> = [
+  { value: BhavanType.MAIN_BHAVAN, label: "मुख्य धर्मशाला" },
+  { value: BhavanType.DEVPURI_BHAVAN, label: "देवपुरी धर्मशाला" },
+  { value: BhavanType.GOVIND_COLONY_BHAVAN, label: "गोविंद कॉलोनी धर्मशाला" },
+]
+
+const EVENT_OPTIONS: Array<{ value: ApplicantBookingFormValues["eventCode"]; label: string }> = [
+  { value: "sooraj_pooja", label: "सूरज पूजा" },
+  { value: "vivah", label: "विवाह" },
+  { value: "sagai", label: "सगाई" },
+  { value: "dharmik_karyakram", label: "धार्मिक कार्यक्रम" },
+  { value: "samaj_karyakram", label: "समाज कार्यक्रम" },
+  { value: "anya", label: "अन्य" },
+]
 
 const DEFAULT_FORM_VALUES: ApplicantBookingFormValues = {
   applicantName: "",
   mobile: "",
+  bhavanType: BhavanType.MAIN_BHAVAN,
   memberType: "member",
-  eventCode: "",
+  membershipNumber: "",
+  eventCode: "sooraj_pooja",
   eventDate: "",
-  timeSlot: "MORNING",
   foodRequired: "no",
   expectedGuests: 1,
   remarks: "",
 }
 
-function mapEventCodeToDomainEventType(eventCode: string): EventType {
-  switch (eventCode) {
-    case "marriage":
-      return EventType.WEDDING
-    case "birthday_party":
-      return EventType.BIRTHDAY
-    case "other":
-      return EventType.OTHER
-    case "sooraj_pooja":
-    case "uttara_kary":
-    case "barsi":
-    case "shraddha_paksh":
-      return EventType.RELIGIOUS_CEREMONY
-    case "mahila_sangeet":
-      return EventType.COMMUNITY_EVENT
-    default:
-      return EventType.OTHER
+function getResourceRequirement(
+  eventType: ApplicantBookingFormValues["eventCode"],
+  foodRequired: ApplicantBookingFormValues["foodRequired"]
+): string {
+  if (eventType === "sooraj_pooja") {
+    return foodRequired === "yes" ? "आधा भवन" : "व्यक्तिगत हॉल"
   }
+  if (eventType === "vivah") {
+    return "पूर्ण भवन"
+  }
+  if (eventType === "samaj_karyakram") {
+    return "सम्पूर्ण भवन"
+  }
+  if (eventType === "sagai") {
+    return "आधा भवन"
+  }
+  return foodRequired === "yes" ? "आधा भवन" : "व्यक्तिगत हॉल"
 }
 
-function mapEventAreaToDomainArea(area: string): AreaCode | null {
-  switch (area) {
-    case "MAIN_HALL":
-      return AreaCode.MAIN_HALL
-    case "DRAWING_ROOM":
-      return AreaCode.DRAWING_ROOM
-    case "CONFERENCE_ROOM":
-      return AreaCode.CONFERENCE_ROOM
-    case "TERRACE":
-      return AreaCode.TERRACE
-    case "GARDEN":
-      return AreaCode.GARDEN
-    case "KITCHEN_AREA":
-      return AreaCode.KITCHEN_AREA
-    case "PARKING":
-      return AreaCode.PARKING
-    default:
-      return null
+function getDuration(eventType: ApplicantBookingFormValues["eventCode"]): string {
+  if (eventType === "vivah" || eventType === "samaj_karyakram") {
+    return "पूरा दिन"
   }
+  return "आधा दिन"
 }
 
-function mapEngineAreaToDomainArea(area: string): AreaCode | null {
-  switch (area) {
-    case "GF":
-      return AreaCode.MAIN_HALL
-    case "SPH":
-      return AreaCode.CONFERENCE_ROOM
-    case "FLW":
-    case "FRW":
-      return AreaCode.DRAWING_ROOM
-    case "RT":
-      return AreaCode.TERRACE
-    default:
-      return null
+function toAvailabilityViewStatus(status: AvailabilityStatus): AvailabilityViewStatus {
+  if (status === AvailabilityStatus.AVAILABLE) {
+    return "available"
   }
+  if (
+    status === AvailabilityStatus.PHONE_RESERVATION ||
+    status === AvailabilityStatus.HALF_BHAVAN ||
+    status === AvailabilityStatus.PARTIALLY_AVAILABLE ||
+    status === AvailabilityStatus.KITCHEN_COORDINATION_REQUIRED ||
+    status === AvailabilityStatus.CONFLICT_REVIEW_REQUIRED
+  ) {
+    return "partial"
+  }
+  return "unavailable"
 }
 
-function mapBookingToAvailability(booking: IBooking): BookingForAvailability {
-  const statusMap: BookingForAvailability["status"] =
-    booking.status === BookingStatus.APPROVED
-      ? "approved"
-      : booking.status === BookingStatus.CONFIRMED
-        ? "confirmed"
-        : booking.status === BookingStatus.REJECTED
-          ? "rejected"
-          : booking.status === BookingStatus.CANCELLED
-            ? "cancelled"
-            : "pending"
-
-  return {
-    id: booking.id,
-    eventType: booking.eventType,
-    date: booking.date,
-    timeSlot: booking.timeSlot.toUpperCase(),
-    requestedArea: booking.requestedArea.map((area) => area.toUpperCase()),
-    allocatedArea: booking.allocatedArea?.map((area) => area.toUpperCase()),
-    foodRequired: booking.foodRequired,
-    kitchenRequired: booking.kitchenRequired,
-    status: statusMap,
+function getAvailabilityDisplay(status: AvailabilityViewStatus): {
+  label: string
+  className: string
+} {
+  if (status === "available") {
+    return { label: "✅ उपलब्ध", className: "text-emerald-700" }
   }
+  if (status === "partial") {
+    return { label: "⚠️ आंशिक उपलब्ध", className: "text-amber-700" }
+  }
+  if (status === "unavailable") {
+    return { label: "❌ उपलब्ध नहीं", className: "text-red-700" }
+  }
+  return { label: "— तिथि चुनें", className: "text-muted-foreground" }
 }
 
-function buildBookingId(timestamp: Date): string {
-  const year = timestamp.getFullYear()
-  const serial = timestamp.getTime().toString().slice(-6)
-  return `BOOK-${year}-${serial}`
+function getMonthKey(eventDate: string): string {
+  if (eventDate) {
+    const [year, month] = eventDate.split("-").map(Number)
+    if (year && month) {
+      return `${year}-${String(month).padStart(2, "0")}`
+    }
+  }
+  const currentDate = new Date()
+  return `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`
 }
 
 export function ApplicantBookingForm() {
-  const events = useMemo(() => getAllEvents(), [])
-  const [formValues, setFormValues] = useState<ApplicantBookingFormValues>(
-    DEFAULT_FORM_VALUES
-  )
+  const [formValues, setFormValues] = useState<ApplicantBookingFormValues>(DEFAULT_FORM_VALUES)
   const [errors, setErrors] = useState<FieldErrors>({})
-  const [draft, setDraft] = useState<BookingDraft | null>(null)
-  const [createdBooking, setCreatedBooking] = useState<IBooking | null>(null)
-  const [localBookings, setLocalBookings] = useState<IBooking[]>([])
+  const [monthRecords, setMonthRecords] = useState<AvailabilityRecord[]>([])
+  const [submitMessage, setSubmitMessage] = useState<string>("")
+
+  const selectedMonthKey = getMonthKey(formValues.eventDate)
+  const [selectedYear, selectedMonth] = selectedMonthKey.split("-").map(Number)
+
+  useEffect(() => {
+    let isMounted = true
+
+    availabilityRepository
+      .getMonthAvailability({
+        bhavanType: formValues.bhavanType,
+        year: selectedYear,
+        month: selectedMonth,
+      })
+      .then((records) => {
+        if (isMounted) {
+          setMonthRecords(records)
+        }
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [formValues.bhavanType, selectedYear, selectedMonth])
+
+  const selectedDateRecord = useMemo(() => {
+    if (!formValues.eventDate) {
+      return undefined
+    }
+    return monthRecords.find((record) => record.date === formValues.eventDate)
+  }, [formValues.eventDate, monthRecords])
+
+  const availabilityStatus: AvailabilityViewStatus = formValues.eventDate
+    ? selectedDateRecord
+      ? toAvailabilityViewStatus(selectedDateRecord.status)
+      : "available"
+    : "not_selected"
+
+  const availabilityDisplay = getAvailabilityDisplay(availabilityStatus)
+  const resourceRequired = getResourceRequirement(formValues.eventCode, formValues.foodRequired)
+  const duration = getDuration(formValues.eventCode)
+  const selectedBhavanLabel =
+    BHAVAN_OPTIONS.find((option) => option.value === formValues.bhavanType)?.label ?? "मुख्य धर्मशाला"
+  const selectedEventLabel =
+    EVENT_OPTIONS.find((option) => option.value === formValues.eventCode)?.label ?? "—"
 
   const handleFieldChange = <K extends keyof ApplicantBookingFormValues>(
     key: K,
@@ -161,11 +186,11 @@ export function ApplicantBookingForm() {
   ) => {
     setFormValues((prev) => ({ ...prev, [key]: value }))
     setErrors((prev) => ({ ...prev, [key]: undefined }))
+    setSubmitMessage("")
   }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setCreatedBooking(null)
 
     const parsed = applicantBookingFormSchema.safeParse(formValues)
     if (!parsed.success) {
@@ -177,121 +202,70 @@ export function ApplicantBookingForm() {
         }
       }
       setErrors(fieldErrors)
-      setDraft(null)
+      setSubmitMessage("")
       return
     }
 
-    const availability = checkAvailability({
-      eventType: parsed.data.eventCode,
-      date: new Date(parsed.data.eventDate),
-      timeSlot: parsed.data.timeSlot,
-      foodRequired: parsed.data.foodRequired === "yes",
-      existingBookings: localBookings.map(mapBookingToAvailability),
-    })
-
-    const selectedEvent = getEventByCode(parsed.data.eventCode)
-    const suggestedAreas = (availability.suggestedAreas ?? [])
-      .map((areaCode) => getAreaByCode(areaCode)?.displayNameHindi ?? areaCode)
-      .filter(Boolean)
-
-    const requestedAreasFromAvailability = (availability.suggestedAreas ?? [])
-      .map(mapEngineAreaToDomainArea)
-      .filter((value): value is AreaCode => value !== null)
-
-    const defaultEventArea = mapEventAreaToDomainArea(selectedEvent?.defaultArea ?? "")
-    const fallbackEventArea =
-      selectedEvent?.allowedAreas
-        .map(mapEventAreaToDomainArea)
-        .find((value): value is AreaCode => value !== null) ?? AreaCode.MAIN_HALL
-
-    const requestedArea =
-      requestedAreasFromAvailability.length > 0
-        ? requestedAreasFromAvailability
-        : [defaultEventArea ?? fallbackEventArea]
-
-    const now = new Date()
-    const booking: IBooking = {
-      id: crypto.randomUUID(),
-      bookingId: buildBookingId(now),
-      applicantName: parsed.data.applicantName.trim(),
-      mobile: parsed.data.mobile.trim(),
-      memberType:
-        parsed.data.memberType === "member"
-          ? MemberType.OWNER
-          : MemberType.NON_MEMBER,
-      eventType: mapEventCodeToDomainEventType(parsed.data.eventCode),
-      eventName:
-        selectedEvent?.nameHindi ??
-        selectedEvent?.nameEnglish ??
-        parsed.data.eventCode,
-      noOfGuests: parsed.data.expectedGuests,
-      date: new Date(parsed.data.eventDate),
-      timeSlot:
-        parsed.data.timeSlot === "MORNING" ? TimeSlot.MORNING : TimeSlot.EVENING,
-      requestedArea,
-      foodRequired: parsed.data.foodRequired === "yes",
-      kitchenRequired: parsed.data.foodRequired === "yes",
-      remarks: parsed.data.remarks?.trim() || undefined,
-      notes: `availability_status:${availability.status}`,
-      status: BookingStatus.REQUEST_RECEIVED,
-      createdAt: now,
-      updatedAt: now,
-    }
-
     setErrors({})
-    setDraft({
-      booking,
-      availabilityStatus: availability.status,
-      suggestedAreas,
-    })
-  }
-
-  const handleConfirm = () => {
-    if (!draft) {
-      return
-    }
-    setCreatedBooking(draft.booking)
-    setLocalBookings((prev) => [...prev, draft.booking])
-    setDraft(null)
-    setFormValues(DEFAULT_FORM_VALUES)
-    setErrors({})
+    setSubmitMessage("जानकारी सफलतापूर्वक सत्यापित हो गई है। समिति समीक्षा हेतु आवेदन तैयार है।")
   }
 
   return (
     <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
       <Card>
         <CardHeader>
-          <CardTitle>आवेदक बुकिंग फॉर्म</CardTitle>
+          <CardTitle>बुद्धिमान भवन बुकिंग सहायक</CardTitle>
           <CardDescription>
-            सभी जानकारी भरें। सबमिट के बाद पुष्टि करके स्थानीय बुकिंग ऑब्जेक्ट बनाया जाएगा।
+            आवश्यक जानकारी भरें। संसाधन आवश्यकता और उपलब्धता स्थिति स्वतः प्रदर्शित होगी।
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form className="grid gap-4" onSubmit={handleSubmit}>
             <div className="grid gap-2">
+              <label className="font-medium">धर्मशाला चयन</label>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {BHAVAN_OPTIONS.map((option) => {
+                  const isSelected = formValues.bhavanType === option.value
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => handleFieldChange("bhavanType", option.value)}
+                      className={cn(
+                        "rounded-md border px-3 py-2 text-sm font-semibold transition-colors",
+                        isSelected
+                          ? "border-primary bg-[#FFF7E8] text-primary"
+                          : "border-border bg-[#FFFDF7] text-foreground hover:bg-[#F7EAD3]"
+                      )}
+                    >
+                      {option.label}
+                    </button>
+                  )
+                })}
+              </div>
+              {errors.bhavanType ? <p className="text-sm text-destructive">{errors.bhavanType}</p> : null}
+            </div>
+
+            <div className="grid gap-2">
               <label htmlFor="applicantName">आवेदक का नाम</label>
               <Input
                 id="applicantName"
                 value={formValues.applicantName}
-                onChange={(event) =>
-                  handleFieldChange("applicantName", event.target.value)
-                }
+                onChange={(event) => handleFieldChange("applicantName", event.target.value)}
               />
-              {errors.applicantName ? (
-                <p className="text-sm text-destructive">{errors.applicantName}</p>
-              ) : null}
+              {errors.applicantName ? <p className="text-sm text-destructive">{errors.applicantName}</p> : null}
             </div>
 
             <div className="grid gap-2">
               <label htmlFor="mobile">मोबाइल नंबर</label>
               <Input
                 id="mobile"
+                inputMode="numeric"
+                maxLength={10}
                 value={formValues.mobile}
-                onChange={(event) => handleFieldChange("mobile", event.target.value)}
+                onChange={(event) => handleFieldChange("mobile", event.target.value.replace(/\D/g, ""))}
               />
-              {errors.mobile ? (
-                <p className="text-sm text-destructive">{errors.mobile}</p>
-              ) : null}
+              {errors.mobile ? <p className="text-sm text-destructive">{errors.mobile}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -310,31 +284,43 @@ export function ApplicantBookingForm() {
                   <SelectItem value="non_member">गैर सदस्य</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.memberType ? (
-                <p className="text-sm text-destructive">{errors.memberType}</p>
-              ) : null}
+              {errors.memberType ? <p className="text-sm text-destructive">{errors.memberType}</p> : null}
             </div>
+
+            {formValues.memberType === "member" ? (
+              <div className="grid gap-2">
+                <label htmlFor="membershipNumber">सदस्यता क्रमांक</label>
+                <Input
+                  id="membershipNumber"
+                  value={formValues.membershipNumber ?? ""}
+                  onChange={(event) => handleFieldChange("membershipNumber", event.target.value)}
+                />
+                {errors.membershipNumber ? (
+                  <p className="text-sm text-destructive">{errors.membershipNumber}</p>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className="grid gap-2">
               <label>कार्यक्रम प्रकार</label>
               <Select
                 value={formValues.eventCode}
-                onValueChange={(value) => handleFieldChange("eventCode", value ?? "")}
+                onValueChange={(value) =>
+                  handleFieldChange("eventCode", (value ?? "sooraj_pooja") as ApplicantBookingFormValues["eventCode"])
+                }
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="कार्यक्रम प्रकार चुनें" />
                 </SelectTrigger>
                 <SelectContent>
-                  {events.map((event) => (
-                    <SelectItem key={event.id} value={event.code}>
-                      {event.nameHindi}
+                  {EVENT_OPTIONS.map((eventOption) => (
+                    <SelectItem key={eventOption.value} value={eventOption.value}>
+                      {eventOption.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {errors.eventCode ? (
-                <p className="text-sm text-destructive">{errors.eventCode}</p>
-              ) : null}
+              {errors.eventCode ? <p className="text-sm text-destructive">{errors.eventCode}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -343,37 +329,9 @@ export function ApplicantBookingForm() {
                 id="eventDate"
                 type="date"
                 value={formValues.eventDate}
-                onChange={(event) =>
-                  handleFieldChange("eventDate", event.target.value)
-                }
+                onChange={(event) => handleFieldChange("eventDate", event.target.value)}
               />
-              {errors.eventDate ? (
-                <p className="text-sm text-destructive">{errors.eventDate}</p>
-              ) : null}
-            </div>
-
-            <div className="grid gap-2">
-              <label>समय स्लॉट</label>
-              <Select
-                value={formValues.timeSlot}
-                onValueChange={(value) =>
-                  handleFieldChange(
-                    "timeSlot",
-                    (value ?? "MORNING") as ApplicantBookingFormValues["timeSlot"]
-                  )
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="समय स्लॉट चुनें" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="MORNING">सुबह</SelectItem>
-                  <SelectItem value="EVENING">शाम</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.timeSlot ? (
-                <p className="text-sm text-destructive">{errors.timeSlot}</p>
-              ) : null}
+              {errors.eventDate ? <p className="text-sm text-destructive">{errors.eventDate}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -381,10 +339,7 @@ export function ApplicantBookingForm() {
               <Select
                 value={formValues.foodRequired}
                 onValueChange={(value) =>
-                  handleFieldChange(
-                    "foodRequired",
-                    (value ?? "no") as ApplicantBookingFormValues["foodRequired"]
-                  )
+                  handleFieldChange("foodRequired", (value ?? "no") as ApplicantBookingFormValues["foodRequired"])
                 }
               >
                 <SelectTrigger className="w-full">
@@ -395,9 +350,7 @@ export function ApplicantBookingForm() {
                   <SelectItem value="no">नहीं</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.foodRequired ? (
-                <p className="text-sm text-destructive">{errors.foodRequired}</p>
-              ) : null}
+              {errors.foodRequired ? <p className="text-sm text-destructive">{errors.foodRequired}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -408,30 +361,24 @@ export function ApplicantBookingForm() {
                 min={1}
                 value={formValues.expectedGuests}
                 onChange={(event) =>
-                  handleFieldChange(
-                    "expectedGuests",
-                    Number(event.target.value || 0)
-                  )
+                  handleFieldChange("expectedGuests", Number(event.target.value || 0))
                 }
               />
-              {errors.expectedGuests ? (
-                <p className="text-sm text-destructive">{errors.expectedGuests}</p>
-              ) : null}
+              {errors.expectedGuests ? <p className="text-sm text-destructive">{errors.expectedGuests}</p> : null}
             </div>
 
             <div className="grid gap-2">
               <label htmlFor="remarks">टिप्पणी</label>
               <Textarea
                 id="remarks"
-                value={formValues.remarks}
+                value={formValues.remarks ?? ""}
                 onChange={(event) => handleFieldChange("remarks", event.target.value)}
               />
-              {errors.remarks ? (
-                <p className="text-sm text-destructive">{errors.remarks}</p>
-              ) : null}
+              {errors.remarks ? <p className="text-sm text-destructive">{errors.remarks}</p> : null}
             </div>
 
-            <Button type="submit">सारांश देखें</Button>
+            <Button type="submit">आवेदन सत्यापित करें</Button>
+            {submitMessage ? <p className="text-sm font-medium text-emerald-700">{submitMessage}</p> : null}
           </form>
         </CardContent>
       </Card>
@@ -439,82 +386,61 @@ export function ApplicantBookingForm() {
       <div className="grid gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>बुकिंग सारांश</CardTitle>
-            <CardDescription>
-              सत्यापन के बाद यहाँ बुकिंग का सारांश दिखेगा।
-            </CardDescription>
+            <CardTitle>इंटेलिजेंट सारांश</CardTitle>
+            <CardDescription>फॉर्म बदलते ही सारांश स्वतः अपडेट होता है।</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-2 text-sm">
-            {draft ? (
+            <p>
+              <strong>धर्मशाला:</strong> {selectedBhavanLabel}
+            </p>
+            <p>
+              <strong>सदस्य प्रकार:</strong> {formValues.memberType === "member" ? "सदस्य" : "गैर सदस्य"}
+            </p>
+            <p>
+              <strong>कार्यक्रम प्रकार:</strong> {selectedEventLabel}
+            </p>
+            <p>
+              <strong>भोजन आवश्यक:</strong> {formValues.foodRequired === "yes" ? "हाँ" : "नहीं"}
+            </p>
+            <p>
+              <strong>संसाधन आवश्यकता:</strong> {resourceRequired}
+            </p>
+            <p>
+              <strong>अवधि:</strong> {duration}
+            </p>
+            <p className={cn("font-semibold", availabilityDisplay.className)}>
+              <strong className="text-foreground">उपलब्धता स्थिति:</strong> {availabilityDisplay.label}
+            </p>
+            {selectedDateRecord ? (
               <>
                 <p>
-                  <strong>बुकिंग आईडी:</strong> {draft.booking.bookingId}
+                  <strong>उपलब्धता रिकॉर्ड:</strong> {selectedDateRecord.eventName}
                 </p>
                 <p>
-                  <strong>आवेदक:</strong> {draft.booking.applicantName}
+                  <strong>टिप्पणी:</strong> {selectedDateRecord.remarks}
                 </p>
-                <p>
-                  <strong>मोबाइल:</strong> {draft.booking.mobile}
-                </p>
-                <p>
-                  <strong>कार्यक्रम:</strong> {draft.booking.eventName}
-                </p>
-                <p>
-                  <strong>तिथि:</strong> {draft.booking.date.toLocaleDateString("hi-IN")}
-                </p>
-                <p>
-                  <strong>समय स्लॉट:</strong>{" "}
-                  {draft.booking.timeSlot === TimeSlot.MORNING ? "सुबह" : "शाम"}
-                </p>
-                <p>
-                  <strong>भोजन आवश्यक:</strong>{" "}
-                  {draft.booking.foodRequired ? "हाँ" : "नहीं"}
-                </p>
-                <p>
-                  <strong>अपेक्षित अतिथि:</strong> {draft.booking.noOfGuests}
-                </p>
-                <p>
-                  <strong>उपलब्धता स्थिति:</strong> {draft.availabilityStatus}
-                </p>
-                <p>
-                  <strong>क्षेत्र सुझाव:</strong>{" "}
-                  {draft.suggestedAreas.length > 0
-                    ? draft.suggestedAreas.join(", ")
-                    : "कोई विशिष्ट सुझाव नहीं"}
-                </p>
-                <p>
-                  <strong>रिक्वेस्ट स्थिति:</strong> {draft.booking.status}
-                </p>
-                <p>
-                  <strong>अनुरोधित क्षेत्र:</strong>{" "}
-                  {draft.booking.requestedArea
-                    .map((area) => AreaCodeLabel[area])
-                    .join(", ")}
-                </p>
-                <Button onClick={handleConfirm}>पुष्टि करें और ऑब्जेक्ट बनाएं</Button>
               </>
-            ) : (
-              <p className="text-muted-foreground">अभी कोई सारांश उपलब्ध नहीं है।</p>
-            )}
+            ) : null}
           </CardContent>
         </Card>
 
-        {createdBooking ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>स्थानीय बुकिंग ऑब्जेक्ट तैयार</CardTitle>
-              <CardDescription>
-                डेटा सेव नहीं किया गया है। यह केवल लोकल ऑब्जेक्ट है।
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <pre className="overflow-auto rounded-lg bg-muted p-3 text-xs">
-                {JSON.stringify(createdBooking, null, 2)}
-              </pre>
-            </CardContent>
-          </Card>
-        ) : null}
+        <Card>
+          <CardHeader>
+            <CardTitle>महत्वपूर्ण निर्देश</CardTitle>
+            <CardDescription>समाज की बुकिंग प्रक्रिया के मुख्य नियम।</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="list-disc space-y-2 pl-5 text-sm text-foreground">
+              <li>सूरज पूजा में भोजन नहीं होने पर व्यक्तिगत हॉल आवंटित किया जाता है।</li>
+              <li>सूरज पूजा में भोजन होने पर आधा भवन आवश्यक माना जाता है।</li>
+              <li>विवाह हेतु पूर्ण भवन तथा समाज कार्यक्रम हेतु सम्पूर्ण भवन आवश्यक है।</li>
+              <li>सदस्य आवेदक के लिए सदस्यता क्रमांक देना अनिवार्य है।</li>
+              <li>बुकिंग हेतु पिछली तिथि चयनित नहीं की जा सकती।</li>
+            </ul>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
 }
+
