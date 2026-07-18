@@ -54,7 +54,7 @@ const DEFAULT_FORM_VALUES: ApplicantBookingFormValues = {
   bhavanType: BhavanType.MAIN_BHAVAN,
   memberType: "member",
   membershipNumber: "",
-  eventCode: "",
+  eventCode: "sooraj_pooja",
   eventDate: "",
   foodRequired: "no",
   expectedGuests: 1,
@@ -176,7 +176,7 @@ export function ApplicantBookingForm() {
       : "available"
     : "not_selected"
 
-  const hasSelectedEvent = formValues.eventCode !== ""
+  const hasSelectedEvent = Boolean(formValues.eventCode)
   const availabilityDisplay = getAvailabilityDisplay(availabilityStatus)
   const resourceRequired = hasSelectedEvent
     ? getResourceRequirement(formValues.eventCode, formValues.foodRequired)
@@ -189,9 +189,9 @@ export function ApplicantBookingForm() {
     EVENT_OPTIONS.find((option) => option.value === formValues.eventCode)?.label ?? "चयनित नहीं"
   const hasAnyPrimaryDetail = Boolean(
     formValues.applicantName.trim() ||
-      formValues.mobile.trim() ||
-      formValues.eventDate.trim() ||
-      (formValues.memberType === "member" && (formValues.membershipNumber ?? "").trim())
+    formValues.mobile.trim() ||
+    formValues.eventDate.trim() ||
+    (formValues.memberType === "member" && (formValues.membershipNumber ?? "").trim())
   )
 
   const handleFieldChange = <K extends keyof ApplicantBookingFormValues>(

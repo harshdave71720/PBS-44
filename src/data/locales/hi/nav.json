@@ -1,9 +1,25 @@
 {
   "cta": "भवन उपलब्धता",
   "items": [
-    { "label": "समाज का विधान", "href": "/samaj-ka-vidhan" },
-    { "label": "वार्षिक उत्सव", "href": "/varshik-utsav" },
-    { "label": "प्रबंध कार्यकारिणी", "href": "/executive-committee" },
-    { "label": "संपर्क", "href": "/sampark" }
+    {
+      "label": "समाज का विधान",
+      "href": "/samaj-ka-vidhan"
+    },
+    {
+      "label": "वार्षिक उत्सव",
+      "href": "/varshik-utsav"
+    },
+    {
+      "label": "प्रबंध कार्यकारिणी",
+      "href": "/executive-committee"
+    },
+    {
+      "label": "सदस्यों की सूची",
+      "href": "/members"
+    },
+    {
+      "label": "संपर्क",
+      "href": "/sampark"
+    }
   ]
 }
