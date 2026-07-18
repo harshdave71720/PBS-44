@@ -30,9 +30,9 @@ export const applicantBookingFormSchema = z.object({
     .trim()
     .max(50, "सदस्यता क्रमांक 50 अक्षरों तक रखें")
     .optional(),
-  eventCode: z.enum(EVENT_TYPE_VALUES, {
-    message: "कार्यक्रम प्रकार चुनना आवश्यक है",
-  }),
+  eventCode: z
+    .union([z.enum(EVENT_TYPE_VALUES), z.literal("")])
+    .refine((value) => value !== "", "कृपया कार्यक्रम प्रकार चुनें।"),
   eventDate: z
     .string()
     .trim()

@@ -54,7 +54,7 @@ const DEFAULT_FORM_VALUES: ApplicantBookingFormValues = {
   bhavanType: BhavanType.MAIN_BHAVAN,
   memberType: "member",
   membershipNumber: "",
-  eventCode: "sooraj_pooja",
+  eventCode: "",
   eventDate: "",
   foodRequired: "no",
   expectedGuests: 1,
@@ -176,14 +176,17 @@ export function ApplicantBookingForm() {
       : "available"
     : "not_selected"
 
+  const hasSelectedEvent = formValues.eventCode !== ""
   const availabilityDisplay = getAvailabilityDisplay(availabilityStatus)
-  const resourceRequired = getResourceRequirement(formValues.eventCode, formValues.foodRequired)
-  const duration = getDuration(formValues.eventCode)
-  const timeSlotDisplay = getTimeSlotDisplay(formValues.eventCode)
+  const resourceRequired = hasSelectedEvent
+    ? getResourceRequirement(formValues.eventCode, formValues.foodRequired)
+    : "—"
+  const duration = hasSelectedEvent ? getDuration(formValues.eventCode) : "—"
+  const timeSlotDisplay = hasSelectedEvent ? getTimeSlotDisplay(formValues.eventCode) : "—"
   const selectedBhavanLabel =
     BHAVAN_OPTIONS.find((option) => option.value === formValues.bhavanType)?.label ?? "मुख्य धर्मशाला"
   const selectedEventLabel =
-    EVENT_OPTIONS.find((option) => option.value === formValues.eventCode)?.label ?? "—"
+    EVENT_OPTIONS.find((option) => option.value === formValues.eventCode)?.label ?? "चयनित नहीं"
   const hasAnyPrimaryDetail = Boolean(
     formValues.applicantName.trim() ||
       formValues.mobile.trim() ||
@@ -315,13 +318,13 @@ export function ApplicantBookingForm() {
             <div className="grid gap-2">
               <label>कार्यक्रम प्रकार</label>
               <Select
-                value={formValues.eventCode}
+                value={formValues.eventCode || undefined}
                 onValueChange={(value) =>
-                  handleFieldChange("eventCode", (value ?? "sooraj_pooja") as ApplicantBookingFormValues["eventCode"])
+                  handleFieldChange("eventCode", (value ?? "") as ApplicantBookingFormValues["eventCode"])
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="कार्यक्रम प्रकार चुनें" />
+                  <SelectValue placeholder="कार्यक्रम चुनें" />
                 </SelectTrigger>
                 <SelectContent>
                   {EVENT_OPTIONS.map((eventOption) => (
@@ -471,6 +474,8 @@ export function ApplicantBookingForm() {
             <ul className="list-disc space-y-2 pl-5 text-sm text-foreground">
               <li>सूरज पूजा बिना भोजन केवल हॉल हेतु मान्य है।</li>
               <li>सूरज पूजा भोजन सहित होने पर न्यूनतम आधा भवन आवश्यक है।</li>
+              <li>बजरंग वाटिका की बुकिंग हेतु भवन मंत्री / कोष मंत्री से संपर्क करें</li>
+              <li>बिजली, बर्तन और साफ़-सफ़ाई का चार्ज अलग से लगेगा।</li>
               <li>समाज कार्यक्रमों हेतु प्राथमिकता समाज को दी जाएगी।</li>
               <li>अंतिम स्वीकृति प्रबंधन समिति द्वारा की जाएगी।</li>
             </ul>
