@@ -14,6 +14,20 @@ export interface BhavanBooking {
   remarks: string;
 }
 
+/**
+ * Safe subset of BhavanBooking for the client.
+ * Sensitive fields (applicantName, mobileNumber, membershipNumber) are
+ * intentionally absent and must never be added here.
+ */
+export interface PublicBookingInfo {
+  bookingDate: string;
+  gaonName: string;
+  eventName: string;
+  resourceType: BhavanBooking['resourceType'];
+  bookingStatus: BhavanBooking['bookingStatus'];
+  foodRequired: string;
+}
+
 export type UIStatus =
   | 'AVAILABLE'
   | 'PARTIALLY_AVAILABLE'
@@ -68,6 +82,39 @@ export function calculateDailyAvailability(
       result[key] =
         current === 'PARTIALLY_AVAILABLE' ? 'FULLY_BOOKED' : 'PARTIALLY_AVAILABLE';
     }
+  }
+
+  return result;
+}
+
+/**
+ * Builds a per-date map of public-safe booking details for the client.
+ * Sensitive fields are stripped at the server boundary — only
+ * PublicBookingInfo fields are included.
+ */
+export function buildPublicBookingsMap(
+  bookings: BhavanBooking[],
+): Record<string, PublicBookingInfo[]> {
+  const { minDate, maxDate } = getBookingDateBoundaries();
+  const result: Record<string, PublicBookingInfo[]> = {};
+
+  for (const booking of bookings) {
+    const date = startOfDay(new Date(booking.bookingDate));
+    if (date < minDate || date > maxDate) continue;
+
+    const key = booking.bookingDate;
+    // Destructure only the safe fields — applicantName, mobileNumber, and
+    // membershipNumber are intentionally left out.
+    const publicInfo: PublicBookingInfo = {
+      bookingDate: booking.bookingDate,
+      gaonName: booking.gaonName,
+      eventName: booking.eventName,
+      resourceType: booking.resourceType,
+      bookingStatus: booking.bookingStatus,
+      foodRequired: booking.foodRequired,
+    };
+
+    result[key] = [...(result[key] ?? []), publicInfo];
   }
 
   return result;
