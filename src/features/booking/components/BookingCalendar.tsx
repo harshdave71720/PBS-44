@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import type { DayButton } from 'react-day-picker';
 import { Calendar, CalendarDayButton } from '@/components/ui/calendar';
@@ -22,7 +23,16 @@ function DayStatusIndicator({ status }: { status: UIStatus | undefined }) {
 }
 
 export function BookingCalendar({ statusMap }: BookingCalendarProps) {
+  const router = useRouter();
   const { minDate, maxDate } = getBookingDateBoundaries();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      router.refresh();
+    }, 10_000);
+
+    return () => clearInterval(interval);
+  }, [router]);
 
   return (
     <div>
