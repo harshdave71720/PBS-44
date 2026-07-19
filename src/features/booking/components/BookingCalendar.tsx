@@ -150,8 +150,8 @@ export function BookingCalendar({ statusMap, publicBookingsMap, bhavanLabel }: B
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-      <Card>
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <Card className="w-full lg:col-span-2">
         <CardHeader>
           <CardTitle>{bhavanLabel}</CardTitle>
           <CardDescription>
@@ -188,7 +188,7 @@ export function BookingCalendar({ statusMap, publicBookingsMap, bhavanLabel }: B
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 self-start">
+      <div className="grid gap-4 self-start lg:col-span-1">
         <Card>
           <CardHeader>
             <CardTitle>बुकिंग विवरण</CardTitle>

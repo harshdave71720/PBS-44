@@ -33,7 +33,7 @@ function Calendar({
       fixedWeeks={props.fixedWeeks ?? true}
       showOutsideDays={showOutsideDays}
       className={cn(
-        "group/calendar bg-background p-4 sm:p-6 [--cell-radius:var(--radius-md)] [--cell-size:--spacing(10)] in-data-[slot=card-content]:bg-transparent in-data-[slot=popover-content]:bg-transparent",
+        "group/calendar bg-background p-3 sm:p-4 md:p-6 [--cell-radius:var(--radius-md)] [--cell-size:--spacing(8)] sm:[--cell-size:--spacing(9)] md:[--cell-size:--spacing(10)] in-data-[slot=card-content]:bg-transparent in-data-[slot=popover-content]:bg-transparent",
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
         String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
         className
@@ -92,7 +92,7 @@ function Calendar({
         month_grid: cn("w-full border-collapse", defaultClassNames.month_grid),
         weekdays: cn("mt-3 flex w-full overflow-hidden rounded-t-md border border-maroon-800/20 bg-[#800000]", defaultClassNames.weekdays),
         weekday: cn(
-          "flex-1 border-r border-white/20 px-2 py-3 text-center text-sm font-semibold text-white select-none last:border-r-0 sm:text-base",
+          "flex-1 border-r border-white/20 px-1 py-2 text-center text-[10px] font-semibold text-white select-none last:border-r-0 sm:px-2 sm:py-3 sm:text-xs md:text-sm",
           defaultClassNames.weekday
         ),
         week: cn("mt-0 flex w-full", defaultClassNames.week),
@@ -212,7 +212,7 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        "relative isolate z-10 flex h-full min-h-(--cell-size) size-auto w-full min-w-(--cell-size) flex-col items-center justify-start gap-1.5 border-0 px-2 py-2 text-base leading-none font-medium group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-[3px] group-data-[focused=true]/day:ring-ring/50 data-[range-end=true]:rounded-(--cell-radius) data-[range-end=true]:rounded-r-(--cell-radius) data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-muted data-[range-middle=true]:text-foreground data-[range-start=true]:rounded-(--cell-radius) data-[range-start=true]:rounded-l-(--cell-radius) data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground dark:hover:text-foreground [&>span]:text-sm [&>span]:opacity-70",
+        "relative isolate z-10 flex h-full min-h-(--cell-size) size-auto w-full min-w-(--cell-size) flex-col items-center justify-start gap-1 border-0 px-1 py-1 text-xs leading-none font-medium group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-[3px] group-data-[focused=true]/day:ring-ring/50 data-[range-end=true]:rounded-(--cell-radius) data-[range-end=true]:rounded-r-(--cell-radius) data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-muted data-[range-middle=true]:text-foreground data-[range-start=true]:rounded-(--cell-radius) data-[range-start=true]:rounded-l-(--cell-radius) data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground sm:gap-1.5 sm:px-2 sm:py-2 sm:text-sm md:text-base dark:hover:text-foreground [&>span]:text-[9px] sm:[&>span]:text-[10px] md:[&>span]:text-xs [&>span]:opacity-70",
         defaultClassNames.day,
         className
       )}
