@@ -2,6 +2,7 @@ import { startOfDay, addDays, addMonths, endOfMonth } from 'date-fns';
 
 export interface BhavanBooking {
   bookingDate: string;
+  bookedFor?: string;
   membershipNumber: number;
   applicantName: string;
   gaonName: string;
@@ -49,11 +50,14 @@ export function calculateDailyAvailability(
   const result: Record<string, UIStatus> = {};
 
   for (const booking of bookings) {
-    const date = startOfDay(new Date(booking.bookingDate));
+    // bookedFor is the actual reservation date; fall back to bookingDate for
+    // legacy rows that pre-date the BookedFor column.
+    const effectiveDate = booking.bookedFor ?? booking.bookingDate;
+    const date = startOfDay(new Date(effectiveDate));
 
     if (date < minDate || date > maxDate) continue;
 
-    const key = booking.bookingDate;
+    const key = effectiveDate;
     const current = result[key] ?? 'AVAILABLE';
 
     // SOCIETY_EVENT locks the entire day — nothing can override it
@@ -107,10 +111,13 @@ export function buildPublicBookingsMap(
   const result: Record<string, PublicBookingInfo[]> = {};
 
   for (const booking of bookings) {
-    const date = startOfDay(new Date(booking.bookingDate));
+    // bookedFor is the actual reservation date; fall back to bookingDate for
+    // legacy rows that pre-date the BookedFor column.
+    const effectiveDate = booking.bookedFor ?? booking.bookingDate;
+    const date = startOfDay(new Date(effectiveDate));
     if (date < minDate || date > maxDate) continue;
 
-    const key = booking.bookingDate;
+    const key = effectiveDate;
     // Destructure only the safe fields — applicantName, mobileNumber, and
     // membershipNumber are intentionally left out.
     const publicInfo: PublicBookingInfo = {

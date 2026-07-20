@@ -63,6 +63,16 @@ export interface AvailabilityCheckResult {
   }
 }
 
+export interface OccupancyBreakdown {
+  confirmedFullBhavan: boolean
+  confirmedHalfBhavanCount: number
+  pendingFullBhavan: boolean
+  pendingHalfBhavanCount: number
+  availableHalfBhavanSlots: number
+  confirmedHalfBhavanEvents: string[]
+  pendingHalfBhavanEvents: string[]
+}
+
 /**
  * Booking information for availability check
  */
@@ -129,6 +139,7 @@ export interface AvailabilityRecord {
   status: AvailabilityStatus
   eventName: string
   remarks: string
+  occupancy?: OccupancyBreakdown
 }
 
 export enum BhavanType {

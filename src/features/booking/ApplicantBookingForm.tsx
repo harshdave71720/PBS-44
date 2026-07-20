@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState, type FormEvent } from "react"
+import { format, parseISO } from "date-fns"
 import { availabilityRepository } from "@/data/availability"
 import {
   AvailabilityStatus,
@@ -29,6 +30,12 @@ import {
   applicantBookingFormSchema,
   type ApplicantBookingFormValues,
 } from "@/features/booking/schema"
+import {
+  getDuration,
+  getEventLabel,
+  getResourceRequirement,
+  getTimeSlotDisplay,
+} from "@/features/booking/utils/submission"
 
 type FieldErrors = Partial<Record<keyof ApplicantBookingFormValues, string>>
 type AvailabilityViewStatus = "not_selected" | "available" | "partial" | "unavailable"
@@ -59,36 +66,6 @@ const DEFAULT_FORM_VALUES: ApplicantBookingFormValues = {
   foodRequired: "no",
   expectedGuests: 1,
   remarks: "",
-}
-
-function getResourceRequirement(
-  eventType: ApplicantBookingFormValues["eventCode"],
-  foodRequired: ApplicantBookingFormValues["foodRequired"]
-): string {
-  switch (eventType) {
-    case "sooraj_pooja":
-      return foodRequired === "yes" ? "आधा भवन" : "व्यक्तिगत हॉल"
-    case "vivah":
-      return "पूर्ण भवन"
-    case "samaj_karyakram":
-      return "सम्पूर्ण भवन"
-    default:
-      return foodRequired === "yes" ? "आधा भवन" : "व्यक्तिगत हॉल"
-  }
-}
-
-function getDuration(eventType: ApplicantBookingFormValues["eventCode"]): string {
-  if (eventType === "vivah" || eventType === "samaj_karyakram") {
-    return "पूरा दिन"
-  }
-  return "आधा दिन"
-}
-
-function getTimeSlotDisplay(eventType: ApplicantBookingFormValues["eventCode"]): string {
-  if (eventType === "vivah" || eventType === "samaj_karyakram") {
-    return "पूरा दिन"
-  }
-  return "सुबह / शाम"
 }
 
 function toAvailabilityViewStatus(status: AvailabilityStatus): AvailabilityViewStatus {
@@ -139,6 +116,8 @@ export function ApplicantBookingForm() {
   const [errors, setErrors] = useState<FieldErrors>({})
   const [monthRecords, setMonthRecords] = useState<AvailabilityRecord[]>([])
   const [submitMessage, setSubmitMessage] = useState<string>("")
+  const [submitError, setSubmitError] = useState<string>("")
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
 
   const selectedMonthKey = getMonthKey(formValues.eventDate)
   const [selectedYear, selectedMonth] = selectedMonthKey.split("-").map(Number)
@@ -185,8 +164,7 @@ export function ApplicantBookingForm() {
   const timeSlotDisplay = hasSelectedEvent ? getTimeSlotDisplay(formValues.eventCode) : "—"
   const selectedBhavanLabel =
     BHAVAN_OPTIONS.find((option) => option.value === formValues.bhavanType)?.label ?? "मुख्य धर्मशाला"
-  const selectedEventLabel =
-    EVENT_OPTIONS.find((option) => option.value === formValues.eventCode)?.label ?? "चयनित नहीं"
+  const selectedEventLabel = getEventLabel(formValues.eventCode)
   const hasAnyPrimaryDetail = Boolean(
     formValues.applicantName.trim() ||
     formValues.mobile.trim() ||
@@ -201,9 +179,10 @@ export function ApplicantBookingForm() {
     setFormValues((prev) => ({ ...prev, [key]: value }))
     setErrors((prev) => ({ ...prev, [key]: undefined }))
     setSubmitMessage("")
+    setSubmitError("")
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const parsed = applicantBookingFormSchema.safeParse(formValues)
@@ -217,11 +196,63 @@ export function ApplicantBookingForm() {
       }
       setErrors(fieldErrors)
       setSubmitMessage("")
+      setSubmitError("")
       return
     }
 
+    setIsSubmitting(true)
     setErrors({})
-    setSubmitMessage("जानकारी सफलतापूर्वक सत्यापित हो गई है। समिति समीक्षा हेतु आवेदन तैयार है।")
+    setSubmitError("")
+
+    try {
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(parsed.data),
+      })
+      const result = (await response.json()) as
+        | {
+          message?: string
+          bookingDate?: string
+          bookedFor?: string
+          error?: string
+          issues?: Array<{ path: string; message: string }>
+        }
+        | undefined
+
+      if (!response.ok) {
+        if (result?.issues?.length) {
+          const fieldErrors: FieldErrors = {}
+          for (const issue of result.issues) {
+            const key = issue.path as keyof ApplicantBookingFormValues
+            if (!fieldErrors[key]) {
+              fieldErrors[key] = issue.message
+            }
+          }
+          setErrors(fieldErrors)
+        }
+
+        throw new Error(result?.error ?? "बुकिंग अनुरोध जमा नहीं हो सका।")
+      }
+
+      const bookingDateLabel =
+        result?.bookingDate ? format(parseISO(result.bookingDate), "dd/MM/yyyy") : "—"
+      const bookedForLabel =
+        result?.bookedFor ? format(parseISO(result.bookedFor), "dd/MM/yyyy") : "—"
+
+      setSubmitMessage(
+        `आवेदन सफलतापूर्वक जमा हो गया। BookingDate ${bookingDateLabel} और BookedFor ${bookedForLabel} के रूप में दर्ज किया गया है।`
+      )
+    } catch (error) {
+      setSubmitMessage("")
+      setSubmitError(
+        error instanceof Error ? error.message : "बुकिंग अनुरोध जमा करते समय अनपेक्षित त्रुटि हुई।"
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -391,8 +422,11 @@ export function ApplicantBookingForm() {
               {errors.remarks ? <p className="text-sm text-destructive">{errors.remarks}</p> : null}
             </div>
 
-            <Button type="submit">आवेदन सत्यापित करें</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "आवेदन जमा हो रहा है..." : "आवेदन जमा करें"}
+            </Button>
             {submitMessage ? <p className="text-sm font-medium text-emerald-700">{submitMessage}</p> : null}
+            {submitError ? <p className="text-sm font-medium text-destructive">{submitError}</p> : null}
           </form>
         </CardContent>
       </Card>

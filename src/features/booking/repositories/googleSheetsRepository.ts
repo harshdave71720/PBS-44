@@ -54,8 +54,15 @@ export async function getBhavanBookings(
         ? format(parsedDate, 'yyyy-MM-dd')
         : rawDate;
 
+      const rawBookedFor = row[5] ?? '';
+      const parsedBookedFor = parse(rawBookedFor, 'dd/MM/yyyy', new Date());
+      const bookedFor = isValid(parsedBookedFor)
+        ? format(parsedBookedFor, 'yyyy-MM-dd')
+        : rawBookedFor || undefined;
+
       return {
         bookingDate,
+        bookedFor,
         membershipNumber: Number(row[1]),
         applicantName: row[2] ?? '',
         gaonName: row[3] ?? '',
