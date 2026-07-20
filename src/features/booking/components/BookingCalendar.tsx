@@ -27,6 +27,7 @@ const RESOURCE_TYPE_LABELS: Record<PublicBookingInfo['resourceType'], string> = 
 
 const BOOKING_STATUS_LABELS: Record<PublicBookingInfo['bookingStatus'], string> = {
   CONFIRMED: 'Confirmed',
+  PENDING: 'Tentative',
   SOCIETY_EVENT: 'Society Event',
   MAINTENANCE: 'Maintenance',
 };
@@ -39,6 +40,7 @@ interface BookingCalendarProps {
 
 function DayStatusIndicator({ status }: { status: UIStatus | undefined }) {
   if (status === 'FULLY_BOOKED') return <span>❌</span>;
+  if (status === 'TENTATIVE') return <span>⚠️</span>;
   if (status === 'PARTIALLY_AVAILABLE') return <span>⚠️</span>;
   if (status === 'SOCIETY_EVENT') return <span>卐</span>;
   return <span className="mt-1 text-[10px] text-green-600">उपलब्ध</span>;
@@ -48,11 +50,13 @@ function BookingDetailPanel({
   date,
   bookings,
   isAvailable,
+  isPending,
   bhavanLabel,
 }: {
   date: string;
   bookings: PublicBookingInfo[];
   isAvailable: boolean;
+  isPending: boolean;
   bhavanLabel: string;
 }) {
   const displayDate = format(parseISO(date), 'd MMMM yyyy');
@@ -80,7 +84,7 @@ function BookingDetailPanel({
           ) : null}
         </div>
       ) : (
-        <div className="grid w-full gap-1.5 text-left">
+        <div className="grid w-full gap-3 text-left">
           {bookings.map((booking, index) => (
             <div key={`${booking.bookingDate}-${index}`} className="space-y-1 text-left">
               <p>
@@ -108,6 +112,11 @@ function BookingDetailPanel({
               )}
             </div>
           ))}
+          {isPending ? (
+            <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-left font-medium text-amber-900">
+              अधिक जानकारी के लिए भवन मंत्री से संपर्क करें।
+            </p>
+          ) : null}
         </div>
       )}
     </div>
@@ -204,6 +213,7 @@ export function BookingCalendar({ statusMap, publicBookingsMap, bhavanLabel }: B
                 date={selectedDate}
                 bookings={publicBookingsMap[selectedDate] ?? []}
                 isAvailable={(statusMap[selectedDate] ?? 'AVAILABLE') === 'AVAILABLE'}
+                isPending={(statusMap[selectedDate] ?? 'AVAILABLE') === 'TENTATIVE'}
                 bhavanLabel={bhavanLabel}
               />
             ) : (
@@ -221,7 +231,7 @@ export function BookingCalendar({ statusMap, publicBookingsMap, bhavanLabel }: B
                 </p>
                 <p>
                   <span className="mr-1">⚠️</span>
-                  Partially Booked (Half-Bhavan)
+                  Tentative / Partially Booked
                 </p>
                 <p>
                   <span className="mr-1 text-[10px] font-medium text-green-600">उपलब्ध</span>

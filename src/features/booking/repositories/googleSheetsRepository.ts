@@ -3,9 +3,23 @@ import { parse, format, isValid } from 'date-fns';
 import { BhavanBooking } from '@/features/booking/utils/availability';
 
 function getSheetsClient() {
+  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+  const key = process.env.GOOGLE_PRIVATE_KEY;
+
+  if (!email) {
+    throw new Error(
+      'GOOGLE_SERVICE_ACCOUNT_EMAIL is missing from environment variables.',
+    );
+  }
+  if (!key) {
+    throw new Error(
+      'GOOGLE_PRIVATE_KEY is missing from environment variables.',
+    );
+  }
+
   const auth = new google.auth.JWT({
-    email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    email,
+    key: key.replace(/\\n/g, '\n'),
     scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
   });
 

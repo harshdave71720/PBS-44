@@ -9,7 +9,7 @@ export interface BhavanBooking {
   eventName: string;
   foodRequired: string;
   resourceType: 'FULL_BHAVAN' | 'HALF_BHAVAN' | 'HALL_ONLY';
-  bookingStatus: 'CONFIRMED' | 'SOCIETY_EVENT' | 'MAINTENANCE';
+  bookingStatus: 'CONFIRMED' | 'PENDING' | 'SOCIETY_EVENT' | 'MAINTENANCE';
   paymentStatus: 'PAID' | 'PENDING' | 'PARTIAL';
   remarks: string;
 }
@@ -30,6 +30,7 @@ export interface PublicBookingInfo {
 
 export type UIStatus =
   | 'AVAILABLE'
+  | 'TENTATIVE'
   | 'PARTIALLY_AVAILABLE'
   | 'FULLY_BOOKED'
   | 'SOCIETY_EVENT';
@@ -65,6 +66,13 @@ export function calculateDailyAvailability(
 
     // FULLY_BOOKED is a terminal state (below SOCIETY_EVENT)
     if (current === 'FULLY_BOOKED') continue;
+
+    if (booking.bookingStatus === 'PENDING') {
+      if (current === 'AVAILABLE') {
+        result[key] = 'TENTATIVE';
+      }
+      continue;
+    }
 
     if (
       booking.bookingStatus === 'MAINTENANCE' ||
