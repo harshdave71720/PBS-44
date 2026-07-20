@@ -13,6 +13,18 @@ export const EVENT_LABELS: Record<
   anya: "अन्य",
 }
 
+const SHEET_EVENT_NAMES: Record<
+  Exclude<ApplicantBookingFormValues["eventCode"], "">,
+  string
+> = {
+  sooraj_pooja: "Sooraj Pooja",
+  vivah: "Vivah",
+  sagai: "Sagai",
+  dharmik_karyakram: "Religious Event",
+  samaj_karyakram: "Social Event",
+  anya: "Other",
+}
+
 export function getEventLabel(
   eventCode: ApplicantBookingFormValues["eventCode"]
 ): string {
@@ -21,6 +33,16 @@ export function getEventLabel(
   }
 
   return EVENT_LABELS[eventCode]
+}
+
+export function getSheetEventName(
+  eventCode: ApplicantBookingFormValues["eventCode"]
+): string {
+  if (!eventCode) {
+    return "Other"
+  }
+
+  return SHEET_EVENT_NAMES[eventCode]
 }
 
 export function getResourceType(

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState, type FormEvent } from "react"
+import { useSearchParams } from "next/navigation"
 import { availabilityRepository } from "@/data/availability"
 import {
   AvailabilityStatus,
@@ -34,6 +35,7 @@ import {
   getEventLabel,
   getResourceRequirement,
   getResourceType,
+  getSheetEventName,
   getTimeSlotDisplay,
 } from "@/features/booking/utils/submission"
 
@@ -112,8 +114,26 @@ function getMonthKey(eventDate: string): string {
   return `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`
 }
 
+function getDateInputValue(selectedDate: string | null): string {
+  if (!selectedDate || !/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
+    return ""
+  }
+
+  const [year, month, day] = selectedDate.split("-").map(Number)
+  const date = new Date(year, month - 1, day)
+
+  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day
+    ? selectedDate
+    : ""
+}
+
 export function ApplicantBookingForm() {
-  const [formValues, setFormValues] = useState<ApplicantBookingFormValues>(DEFAULT_FORM_VALUES)
+  const searchParams = useSearchParams()
+  const selectedDate = getDateInputValue(searchParams?.get("selectedDate") ?? null)
+  const [formValues, setFormValues] = useState<ApplicantBookingFormValues>(() => ({
+    ...DEFAULT_FORM_VALUES,
+    eventDate: selectedDate,
+  }))
   const [errors, setErrors] = useState<FieldErrors>({})
   const [monthRecords, setMonthRecords] = useState<AvailabilityRecord[]>([])
   const [submitError, setSubmitError] = useState<string>("")
@@ -205,30 +225,31 @@ export function ApplicantBookingForm() {
     setShowSuccessModal(false)
 
     try {
-      const response = await fetch("/api/booking/request", {
+      const formData = {
+        membershipNumber: parsed.data.membershipNumber ?? "",
+        applicantName: parsed.data.applicantName,
+        gaonName: parsed.data.gaonName,
+        mobileNumber: parsed.data.mobile,
+        bookedFor: parsed.data.eventDate,
+        eventName: getSheetEventName(parsed.data.eventCode),
+        foodRequired: parsed.data.foodRequired,
+        resourceType: getResourceType(parsed.data.eventCode, parsed.data.foodRequired),
+        bhavanName: selectedBhavanLabel,
+      }
+      const res = await fetch("/api/booking/request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          membershipNumber: parsed.data.membershipNumber ?? "",
-          applicantName: parsed.data.applicantName,
-          gaonName: parsed.data.gaonName,
-          mobileNumber: parsed.data.mobile,
-          bookedFor: parsed.data.eventDate,
-          eventName: getEventLabel(parsed.data.eventCode),
-          foodRequired: parsed.data.foodRequired,
-          resourceType: getResourceType(parsed.data.eventCode, parsed.data.foodRequired),
-          bhavanName: selectedBhavanLabel,
-        }),
+        body: JSON.stringify(formData),
       })
-      const result = (await response.json()) as
+      const result = (await res.json()) as
         | {
           error?: string
         }
         | undefined
 
-      if (!response.ok) {
+      if (!res.ok) {
         throw new Error(result?.error ?? "बुकिंग अनुरोध जमा नहीं हो सका।")
       }
 

@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { ApplicantBookingForm } from "@/features/booking/ApplicantBookingForm"
 
 export default function BookingFormPage() {
@@ -9,7 +10,9 @@ export default function BookingFormPage() {
           फॉर्म भरें, उपलब्धता जांचें, सारांश देखें और बुकिंग ऑब्जेक्ट की पुष्टि करें।
         </p>
       </div>
-      <ApplicantBookingForm />
+      <Suspense fallback={<div className="h-96 animate-pulse rounded-lg bg-muted" />}>
+        <ApplicantBookingForm />
+      </Suspense>
     </section>
   )
 }
