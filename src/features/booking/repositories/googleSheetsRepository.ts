@@ -46,7 +46,7 @@ export async function getBhavanBookings(
     });
 
     const rows = response.data.values ?? [];
-
+    console.log(rows);
     return rows.map((row): BhavanBooking => {
       const rawDate = row[0] ?? '';
       const parsedDate = parse(rawDate, 'dd/MM/yyyy', new Date());
@@ -67,12 +67,12 @@ export async function getBhavanBookings(
         applicantName: row[2] ?? '',
         gaonName: row[3] ?? '',
         mobileNumber: row[4] ?? '',
-        eventName: row[5] ?? '',
-        foodRequired: row[6] ?? '',
-        resourceType: row[7] as BhavanBooking['resourceType'],
-        bookingStatus: row[8] as BhavanBooking['bookingStatus'],
-        paymentStatus: row[9] as BhavanBooking['paymentStatus'],
-        remarks: row[10] ?? '',
+        eventName: row[6] ?? '',
+        foodRequired: row[7] ?? '',
+        resourceType: row[8] as BhavanBooking['resourceType'],
+        bookingStatus: row[9] as BhavanBooking['bookingStatus'],
+        paymentStatus: row[10] as BhavanBooking['paymentStatus'],
+        remarks: row[11] ?? '',
       };
     });
   } catch (error) {
