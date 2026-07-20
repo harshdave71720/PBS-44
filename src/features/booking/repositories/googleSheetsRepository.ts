@@ -46,7 +46,7 @@ export async function getBhavanBookings(
     });
 
     const rows = response.data.values ?? [];
-    console.log(rows);
+
     return rows.map((row): BhavanBooking => {
       const rawDate = row[0] ?? '';
       const parsedDate = parse(rawDate, 'dd/MM/yyyy', new Date());
