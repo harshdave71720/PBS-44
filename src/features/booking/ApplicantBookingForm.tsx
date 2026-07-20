@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useMemo, useState, type FormEvent } from "react"
-import { format, parseISO } from "date-fns"
 import { availabilityRepository } from "@/data/availability"
 import {
   AvailabilityStatus,
@@ -34,6 +33,7 @@ import {
   getDuration,
   getEventLabel,
   getResourceRequirement,
+  getResourceType,
   getTimeSlotDisplay,
 } from "@/features/booking/utils/submission"
 
@@ -57,6 +57,7 @@ const EVENT_OPTIONS: Array<{ value: ApplicantBookingFormValues["eventCode"]; lab
 
 const DEFAULT_FORM_VALUES: ApplicantBookingFormValues = {
   applicantName: "",
+  gaonName: "",
   mobile: "",
   bhavanType: BhavanType.MAIN_BHAVAN,
   memberType: "member",
@@ -115,9 +116,9 @@ export function ApplicantBookingForm() {
   const [formValues, setFormValues] = useState<ApplicantBookingFormValues>(DEFAULT_FORM_VALUES)
   const [errors, setErrors] = useState<FieldErrors>({})
   const [monthRecords, setMonthRecords] = useState<AvailabilityRecord[]>([])
-  const [submitMessage, setSubmitMessage] = useState<string>("")
   const [submitError, setSubmitError] = useState<string>("")
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
 
   const selectedMonthKey = getMonthKey(formValues.eventDate)
   const [selectedYear, selectedMonth] = selectedMonthKey.split("-").map(Number)
@@ -178,7 +179,6 @@ export function ApplicantBookingForm() {
   ) => {
     setFormValues((prev) => ({ ...prev, [key]: value }))
     setErrors((prev) => ({ ...prev, [key]: undefined }))
-    setSubmitMessage("")
     setSubmitError("")
   }
 
@@ -195,7 +195,6 @@ export function ApplicantBookingForm() {
         }
       }
       setErrors(fieldErrors)
-      setSubmitMessage("")
       setSubmitError("")
       return
     }
@@ -203,50 +202,38 @@ export function ApplicantBookingForm() {
     setIsSubmitting(true)
     setErrors({})
     setSubmitError("")
+    setShowSuccessModal(false)
 
     try {
-      const response = await fetch("/api/bookings", {
+      const response = await fetch("/api/booking/request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(parsed.data),
+        body: JSON.stringify({
+          membershipNumber: parsed.data.membershipNumber ?? "",
+          applicantName: parsed.data.applicantName,
+          gaonName: parsed.data.gaonName,
+          mobileNumber: parsed.data.mobile,
+          bookedFor: parsed.data.eventDate,
+          eventName: getEventLabel(parsed.data.eventCode),
+          foodRequired: parsed.data.foodRequired,
+          resourceType: getResourceType(parsed.data.eventCode, parsed.data.foodRequired),
+          bhavanName: selectedBhavanLabel,
+        }),
       })
       const result = (await response.json()) as
         | {
-          message?: string
-          bookingDate?: string
-          bookedFor?: string
           error?: string
-          issues?: Array<{ path: string; message: string }>
         }
         | undefined
 
       if (!response.ok) {
-        if (result?.issues?.length) {
-          const fieldErrors: FieldErrors = {}
-          for (const issue of result.issues) {
-            const key = issue.path as keyof ApplicantBookingFormValues
-            if (!fieldErrors[key]) {
-              fieldErrors[key] = issue.message
-            }
-          }
-          setErrors(fieldErrors)
-        }
-
         throw new Error(result?.error ?? "बुकिंग अनुरोध जमा नहीं हो सका।")
       }
 
-      const bookingDateLabel =
-        result?.bookingDate ? format(parseISO(result.bookingDate), "dd/MM/yyyy") : "—"
-      const bookedForLabel =
-        result?.bookedFor ? format(parseISO(result.bookedFor), "dd/MM/yyyy") : "—"
-
-      setSubmitMessage(
-        `आवेदन सफलतापूर्वक जमा हो गया। BookingDate ${bookingDateLabel} और BookedFor ${bookedForLabel} के रूप में दर्ज किया गया है।`
-      )
+      setShowSuccessModal(true)
     } catch (error) {
-      setSubmitMessage("")
       setSubmitError(
         error instanceof Error ? error.message : "बुकिंग अनुरोध जमा करते समय अनपेक्षित त्रुटि हुई।"
       )
@@ -311,6 +298,16 @@ export function ApplicantBookingForm() {
                 onChange={(event) => handleFieldChange("mobile", event.target.value.replace(/\D/g, ""))}
               />
               {errors.mobile ? <p className="text-sm text-destructive">{errors.mobile}</p> : null}
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="gaonName">गाँव का नाम</label>
+              <Input
+                id="gaonName"
+                value={formValues.gaonName}
+                onChange={(event) => handleFieldChange("gaonName", event.target.value)}
+              />
+              {errors.gaonName ? <p className="text-sm text-destructive">{errors.gaonName}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -423,9 +420,8 @@ export function ApplicantBookingForm() {
             </div>
 
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "आवेदन जमा हो रहा है..." : "आवेदन जमा करें"}
+              {isSubmitting ? "जमा हो रहा है..." : "आवेदन जमा करें"}
             </Button>
-            {submitMessage ? <p className="text-sm font-medium text-emerald-700">{submitMessage}</p> : null}
             {submitError ? <p className="text-sm font-medium text-destructive">{submitError}</p> : null}
           </form>
         </CardContent>
@@ -516,6 +512,29 @@ export function ApplicantBookingForm() {
           </CardContent>
         </Card>
       </div>
+
+      {showSuccessModal ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="booking-success-title"
+        >
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle id="booking-success-title">जय चारभूजा री</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-3">
+              <p>आपका अनुरोध सफलतापूर्वक जमा हो गया है।</p>
+              <p>अब आपको आगे की प्रक्रिया के लिए भवन मंत्री से संपर्क करना होगा।</p>
+              <p>धन्यवाद!</p>
+              <Button type="button" onClick={() => setShowSuccessModal(false)}>
+                OK
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      ) : null}
     </div>
   )
 }

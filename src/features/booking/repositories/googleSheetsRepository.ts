@@ -20,10 +20,67 @@ function getSheetsClient() {
   const auth = new google.auth.JWT({
     email,
     key: key.replace(/\\n/g, '\n'),
-    scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
 
   return google.sheets({ version: 'v4', auth });
+}
+
+type CreateBookingRequestParams = {
+  membershipNumber: string | number;
+  applicantName: string;
+  gaonName: string;
+  mobileNumber: string;
+  bookedFor: string;
+  eventName: string;
+  foodRequired: string;
+  resourceType: string;
+  bhavanName: string;
+};
+
+export async function createBookingRequest({
+  membershipNumber,
+  applicantName,
+  gaonName,
+  mobileNumber,
+  bookedFor,
+  eventName,
+  foodRequired,
+  resourceType,
+  bhavanName,
+}: CreateBookingRequestParams) {
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+
+  if (!spreadsheetId) {
+    throw new Error(
+      'GOOGLE_SHEET_ID is missing from environment variables. Please check your .env.local file.',
+    );
+  }
+
+  const timestamp = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
+  const row = [
+    timestamp,
+    membershipNumber,
+    applicantName,
+    gaonName,
+    mobileNumber,
+    bookedFor,
+    eventName,
+    foodRequired,
+    resourceType,
+    'PENDING',
+    'PENDING',
+    `Requested for ${bhavanName}`,
+  ];
+
+  const sheets = getSheetsClient();
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId,
+    range: "'Booking_Requests'!A:L",
+    valueInputOption: 'USER_ENTERED',
+    requestBody: { values: [row] },
+  });
 }
 
 export async function getBhavanBookings(

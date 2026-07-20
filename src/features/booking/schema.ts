@@ -15,6 +15,10 @@ export const applicantBookingFormSchema = z.object({
     .string()
     .trim()
     .min(1, "आवेदक का नाम आवश्यक है"),
+  gaonName: z
+    .string()
+    .trim()
+    .min(1, "गाँव का नाम आवश्यक है"),
   mobile: z
     .string()
     .trim()
