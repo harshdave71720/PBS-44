@@ -18,8 +18,9 @@ import {
   PublicBookingInfo,
   getBookingDateBoundaries,
 } from '@/features/booking/utils/availability';
+import type { BhavanType } from '@/types/availability';
 
-const RESOURCE_TYPE_LABELS: Record<PublicBookingInfo['resourceType'], string> = {
+const BOOKING_TYPE_LABELS: Record<PublicBookingInfo['bookingType'], string> = {
   FULL_BHAVAN: 'Full Bhavan (पूर्ण भवन)',
   HALF_BHAVAN: 'Half Bhavan (अर्ध भवन)',
   HALL_ONLY: 'Hall Only (केवल हॉल)',
@@ -36,6 +37,7 @@ interface BookingCalendarProps {
   statusMap: Record<string, UIStatus>;
   publicBookingsMap: Record<string, PublicBookingInfo[]>;
   bhavanLabel: string;
+  bhavanType: BhavanType;
 }
 
 function DayStatusIndicator({ status }: { status: UIStatus | undefined }) {
@@ -52,12 +54,14 @@ function BookingDetailPanel({
   isAvailable,
   isPending,
   bhavanLabel,
+  bhavanType,
 }: {
   date: string;
   bookings: PublicBookingInfo[];
   isAvailable: boolean;
   isPending: boolean;
   bhavanLabel: string;
+  bhavanType: BhavanType;
 }) {
   const displayDate = format(parseISO(date), 'd MMMM yyyy');
 
@@ -76,7 +80,7 @@ function BookingDetailPanel({
           </p>
           {isAvailable ? (
             <Link
-              href={`/booking-form?selectedDate=${encodeURIComponent(date)}`}
+              href={`/booking-form?selectedDate=${encodeURIComponent(date)}&bhavan=${encodeURIComponent(bhavanType)}`}
               className="inline-flex rounded-md bg-[#dcd0a6] px-4 py-2 text-sm font-semibold text-[#7A1C1C] transition-colors hover:bg-[#d1c18f]"
             >
               आवेदन पत्र भरें →
@@ -89,7 +93,7 @@ function BookingDetailPanel({
             <div key={`${booking.bookingDate}-${index}`} className="space-y-1 text-left">
               <p>
                 <strong>Venue:</strong>{' '}
-                {RESOURCE_TYPE_LABELS[booking.resourceType] ?? booking.resourceType}
+                {BOOKING_TYPE_LABELS[booking.bookingType] ?? booking.bookingType}
               </p>
               <p>
                 <strong>Status:</strong>{' '}
@@ -98,16 +102,6 @@ function BookingDetailPanel({
               {booking.eventName && (
                 <p>
                   <strong>Event:</strong> {booking.eventName}
-                </p>
-              )}
-              {booking.gaonName && (
-                <p>
-                  <strong>Village:</strong> {booking.gaonName}
-                </p>
-              )}
-              {booking.foodRequired && (
-                <p>
-                  <strong>Food:</strong> {booking.foodRequired}
                 </p>
               )}
             </div>
@@ -123,7 +117,12 @@ function BookingDetailPanel({
   );
 }
 
-export function BookingCalendar({ statusMap, publicBookingsMap, bhavanLabel }: BookingCalendarProps) {
+export function BookingCalendar({
+  statusMap,
+  publicBookingsMap,
+  bhavanLabel,
+  bhavanType,
+}: BookingCalendarProps) {
   const router = useRouter();
   const { minDate, maxDate } = getBookingDateBoundaries();
   const currentMonth = startOfMonth(new Date());
@@ -215,6 +214,7 @@ export function BookingCalendar({ statusMap, publicBookingsMap, bhavanLabel }: B
                 isAvailable={(statusMap[selectedDate] ?? 'AVAILABLE') === 'AVAILABLE'}
                 isPending={(statusMap[selectedDate] ?? 'AVAILABLE') === 'TENTATIVE'}
                 bhavanLabel={bhavanLabel}
+                bhavanType={bhavanType}
               />
             ) : (
               <p className="rounded-lg border border-border bg-[#FFFDF7] px-3 py-3 text-center text-muted-foreground">

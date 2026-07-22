@@ -53,6 +53,7 @@ export default async function BookingPage({
         statusMap={statusMap}
         publicBookingsMap={publicBookingsMap}
         bhavanLabel={sheetName}
+        bhavanType={bhavanType}
       />
     </section>
   );

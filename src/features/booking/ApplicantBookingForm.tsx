@@ -31,10 +31,8 @@ import {
   type ApplicantBookingFormValues,
 } from "@/features/booking/schema"
 import {
-  getDuration,
+  getBookingTypeLabel,
   getEventLabel,
-  getResourceRequirement,
-  getResourceType,
   getSheetEventName,
   getTimeSlotDisplay,
 } from "@/features/booking/utils/submission"
@@ -48,27 +46,27 @@ const BHAVAN_OPTIONS: Array<{ value: BhavanType; label: string }> = [
   { value: BhavanType.GOVIND_COLONY_BHAVAN, label: "गोविंद कॉलोनी धर्मशाला" },
 ]
 
-const EVENT_OPTIONS: Array<{ value: ApplicantBookingFormValues["eventCode"]; label: string }> = [
-  { value: "sooraj_pooja", label: "सूरज पूजा" },
-  { value: "vivah", label: "विवाह" },
-  { value: "sagai", label: "सगाई" },
+const EVENT_OPTIONS: Array<{ value: ApplicantBookingFormValues["eventName"]; label: string }> = [
+  { value: "manglik_karyakram", label: "मांगलिक कार्यक्रम" },
+  { value: "shok_uttarkaryakram", label: "शोक / उत्तरकार्य कार्यक्रम" },
   { value: "dharmik_karyakram", label: "धार्मिक कार्यक्रम" },
-  { value: "samaj_karyakram", label: "समाज कार्यक्रम" },
+  { value: "samaj_karyakram", label: "सामाजिक कार्यक्रम" },
   { value: "anya", label: "अन्य" },
 ]
 
 const DEFAULT_FORM_VALUES: ApplicantBookingFormValues = {
-  applicantName: "",
-  gaonName: "",
-  mobile: "",
-  bhavanType: BhavanType.MAIN_BHAVAN,
   memberType: "member",
   membershipNumber: "",
-  eventCode: "sooraj_pooja",
-  eventDate: "",
-  foodRequired: "no",
-  expectedGuests: 1,
+  memberName: "",
+  memberMobileNumber: "",
+  gaonName: "",
+  applicantName: "",
+  applicantMobileNumber: "",
+  bookedFor: "",
+  eventName: "manglik_karyakram",
+  bookingType: "FULL_BHAVAN",
   remarks: "",
+  bhavanType: BhavanType.MAIN_BHAVAN,
 }
 
 function toAvailabilityViewStatus(status: AvailabilityStatus): AvailabilityViewStatus {
@@ -103,9 +101,9 @@ function getAvailabilityDisplay(status: AvailabilityViewStatus): {
   return { label: "— तिथि चुनें", className: "text-muted-foreground" }
 }
 
-function getMonthKey(eventDate: string): string {
-  if (eventDate) {
-    const [year, month] = eventDate.split("-").map(Number)
+function getMonthKey(bookedFor: string): string {
+  if (bookedFor) {
+    const [year, month] = bookedFor.split("-").map(Number)
     if (year && month) {
       return `${year}-${String(month).padStart(2, "0")}`
     }
@@ -127,12 +125,20 @@ function getDateInputValue(selectedDate: string | null): string {
     : ""
 }
 
+function getBhavanTypeValue(bhavan: string | null): BhavanType | undefined {
+  return Object.values(BhavanType).includes(bhavan as BhavanType)
+    ? (bhavan as BhavanType)
+    : undefined
+}
+
 export function ApplicantBookingForm() {
   const searchParams = useSearchParams()
   const selectedDate = getDateInputValue(searchParams?.get("selectedDate") ?? null)
+  const requestedBhavanType = getBhavanTypeValue(searchParams?.get("bhavan") ?? null)
   const [formValues, setFormValues] = useState<ApplicantBookingFormValues>(() => ({
     ...DEFAULT_FORM_VALUES,
-    eventDate: selectedDate,
+    bookedFor: selectedDate,
+    bhavanType: requestedBhavanType ?? DEFAULT_FORM_VALUES.bhavanType,
   }))
   const [errors, setErrors] = useState<FieldErrors>({})
   const [monthRecords, setMonthRecords] = useState<AvailabilityRecord[]>([])
@@ -140,7 +146,13 @@ export function ApplicantBookingForm() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
 
-  const selectedMonthKey = getMonthKey(formValues.eventDate)
+  useEffect(() => {
+    if (requestedBhavanType) {
+      setFormValues((previous) => ({ ...previous, bhavanType: requestedBhavanType }))
+    }
+  }, [requestedBhavanType])
+
+  const selectedMonthKey = getMonthKey(formValues.bookedFor)
   const [selectedYear, selectedMonth] = selectedMonthKey.split("-").map(Number)
 
   useEffect(() => {
@@ -164,32 +176,29 @@ export function ApplicantBookingForm() {
   }, [formValues.bhavanType, selectedYear, selectedMonth])
 
   const selectedDateRecord = useMemo(() => {
-    if (!formValues.eventDate) {
+    if (!formValues.bookedFor) {
       return undefined
     }
-    return monthRecords.find((record) => record.date === formValues.eventDate)
-  }, [formValues.eventDate, monthRecords])
+    return monthRecords.find((record) => record.date === formValues.bookedFor)
+  }, [formValues.bookedFor, monthRecords])
 
-  const availabilityStatus: AvailabilityViewStatus = formValues.eventDate
+  const availabilityStatus: AvailabilityViewStatus = formValues.bookedFor
     ? selectedDateRecord
       ? toAvailabilityViewStatus(selectedDateRecord.status)
       : "available"
     : "not_selected"
 
-  const hasSelectedEvent = Boolean(formValues.eventCode)
+  const hasSelectedEvent = Boolean(formValues.eventName)
   const availabilityDisplay = getAvailabilityDisplay(availabilityStatus)
-  const resourceRequired = hasSelectedEvent
-    ? getResourceRequirement(formValues.eventCode, formValues.foodRequired)
-    : "—"
-  const duration = hasSelectedEvent ? getDuration(formValues.eventCode) : "—"
-  const timeSlotDisplay = hasSelectedEvent ? getTimeSlotDisplay(formValues.eventCode) : "—"
+  const resourceRequired = getBookingTypeLabel(formValues.bookingType)
+  const timeSlotDisplay = hasSelectedEvent ? getTimeSlotDisplay(formValues.eventName) : "—"
   const selectedBhavanLabel =
     BHAVAN_OPTIONS.find((option) => option.value === formValues.bhavanType)?.label ?? "मुख्य धर्मशाला"
-  const selectedEventLabel = getEventLabel(formValues.eventCode)
+  const selectedEventLabel = getEventLabel(formValues.eventName)
   const hasAnyPrimaryDetail = Boolean(
     formValues.applicantName.trim() ||
-    formValues.mobile.trim() ||
-    formValues.eventDate.trim() ||
+    formValues.applicantMobileNumber.trim() ||
+    formValues.bookedFor.trim() ||
     (formValues.memberType === "member" && (formValues.membershipNumber ?? "").trim())
   )
 
@@ -227,14 +236,16 @@ export function ApplicantBookingForm() {
     try {
       const formData = {
         membershipNumber: parsed.data.membershipNumber ?? "",
+        memberName: parsed.data.memberName,
+        memberMobileNumber: parsed.data.memberMobileNumber,
         applicantName: parsed.data.applicantName,
         gaonName: parsed.data.gaonName,
-        mobileNumber: parsed.data.mobile,
-        bookedFor: parsed.data.eventDate,
-        eventName: getSheetEventName(parsed.data.eventCode),
-        foodRequired: parsed.data.foodRequired,
-        resourceType: getResourceType(parsed.data.eventCode, parsed.data.foodRequired),
+        applicantMobileNumber: parsed.data.applicantMobileNumber,
+        bookedFor: parsed.data.bookedFor,
+        eventName: getSheetEventName(parsed.data.eventName),
+        bookingType: parsed.data.bookingType,
         bhavanName: selectedBhavanLabel,
+        remarks: parsed.data.remarks,
       }
       const res = await fetch("/api/booking/request", {
         method: "POST",
@@ -300,38 +311,6 @@ export function ApplicantBookingForm() {
             </div>
 
             <div className="grid gap-2">
-              <label htmlFor="applicantName">आवेदक का नाम</label>
-              <Input
-                id="applicantName"
-                value={formValues.applicantName}
-                onChange={(event) => handleFieldChange("applicantName", event.target.value)}
-              />
-              {errors.applicantName ? <p className="text-sm text-destructive">{errors.applicantName}</p> : null}
-            </div>
-
-            <div className="grid gap-2">
-              <label htmlFor="mobile">मोबाइल नंबर</label>
-              <Input
-                id="mobile"
-                inputMode="numeric"
-                maxLength={10}
-                value={formValues.mobile}
-                onChange={(event) => handleFieldChange("mobile", event.target.value.replace(/\D/g, ""))}
-              />
-              {errors.mobile ? <p className="text-sm text-destructive">{errors.mobile}</p> : null}
-            </div>
-
-            <div className="grid gap-2">
-              <label htmlFor="gaonName">गाँव का नाम</label>
-              <Input
-                id="gaonName"
-                value={formValues.gaonName}
-                onChange={(event) => handleFieldChange("gaonName", event.target.value)}
-              />
-              {errors.gaonName ? <p className="text-sm text-destructive">{errors.gaonName}</p> : null}
-            </div>
-
-            <div className="grid gap-2">
               <label>सदस्य प्रकार</label>
               <Select
                 value={formValues.memberType}
@@ -350,26 +329,79 @@ export function ApplicantBookingForm() {
               {errors.memberType ? <p className="text-sm text-destructive">{errors.memberType}</p> : null}
             </div>
 
-            {formValues.memberType === "member" ? (
-              <div className="grid gap-2">
-                <label htmlFor="membershipNumber">सदस्य क्रमांक</label>
-                <Input
-                  id="membershipNumber"
-                  value={formValues.membershipNumber ?? ""}
-                  onChange={(event) => handleFieldChange("membershipNumber", event.target.value)}
-                />
-                {errors.membershipNumber ? (
-                  <p className="text-sm text-destructive">{errors.membershipNumber}</p>
-                ) : null}
-              </div>
-            ) : null}
+            <div className="grid gap-2">
+              <label htmlFor="membershipNumber">सदस्य क्रमांक</label>
+              <Input
+                id="membershipNumber"
+                value={formValues.membershipNumber ?? ""}
+                onChange={(event) => handleFieldChange("membershipNumber", event.target.value)}
+              />
+              {errors.membershipNumber ? <p className="text-sm text-destructive">{errors.membershipNumber}</p> : null}
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="memberName">सदस्य नाम</label>
+              <Input
+                id="memberName"
+                value={formValues.memberName}
+                onChange={(event) => handleFieldChange("memberName", event.target.value)}
+              />
+              {errors.memberName ? <p className="text-sm text-destructive">{errors.memberName}</p> : null}
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="memberMobileNumber">सदस्य का मोबाइल नंबर</label>
+              <Input
+                id="memberMobileNumber"
+                inputMode="numeric"
+                maxLength={10}
+                value={formValues.memberMobileNumber}
+                onChange={(event) => handleFieldChange("memberMobileNumber", event.target.value.replace(/\D/g, ""))}
+              />
+              {errors.memberMobileNumber ? <p className="text-sm text-destructive">{errors.memberMobileNumber}</p> : null}
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="gaonName">गाँव का नाम</label>
+              <Input id="gaonName" value={formValues.gaonName} onChange={(event) => handleFieldChange("gaonName", event.target.value)} />
+              {errors.gaonName ? <p className="text-sm text-destructive">{errors.gaonName}</p> : null}
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="applicantName">आवेदक का नाम</label>
+              <Input id="applicantName" value={formValues.applicantName} onChange={(event) => handleFieldChange("applicantName", event.target.value)} />
+              {errors.applicantName ? <p className="text-sm text-destructive">{errors.applicantName}</p> : null}
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="applicantMobileNumber">आवेदक का मोबाइल नंबर</label>
+              <Input
+                id="applicantMobileNumber"
+                inputMode="numeric"
+                maxLength={10}
+                value={formValues.applicantMobileNumber}
+                onChange={(event) => handleFieldChange("applicantMobileNumber", event.target.value.replace(/\D/g, ""))}
+              />
+              {errors.applicantMobileNumber ? <p className="text-sm text-destructive">{errors.applicantMobileNumber}</p> : null}
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="bookedFor">तिथि</label>
+              <Input
+                id="bookedFor"
+                type="date"
+                value={formValues.bookedFor}
+                onChange={(event) => handleFieldChange("bookedFor", event.target.value)}
+              />
+              {errors.bookedFor ? <p className="text-sm text-destructive">{errors.bookedFor}</p> : null}
+            </div>
 
             <div className="grid gap-2">
               <label>कार्यक्रम प्रकार</label>
               <Select
-                value={formValues.eventCode || undefined}
+                value={formValues.eventName || undefined}
                 onValueChange={(value) =>
-                  handleFieldChange("eventCode", (value ?? "") as ApplicantBookingFormValues["eventCode"])
+                  handleFieldChange("eventName", (value ?? "") as ApplicantBookingFormValues["eventName"])
                 }
               >
                 <SelectTrigger className="w-full">
@@ -383,51 +415,30 @@ export function ApplicantBookingForm() {
                   ))}
                 </SelectContent>
               </Select>
-              {errors.eventCode ? <p className="text-sm text-destructive">{errors.eventCode}</p> : null}
+              {errors.eventName ? <p className="text-sm text-destructive">{errors.eventName}</p> : null}
             </div>
 
             <div className="grid gap-2">
-              <label htmlFor="eventDate">तिथि</label>
-              <Input
-                id="eventDate"
-                type="date"
-                value={formValues.eventDate}
-                onChange={(event) => handleFieldChange("eventDate", event.target.value)}
-              />
-              {errors.eventDate ? <p className="text-sm text-destructive">{errors.eventDate}</p> : null}
-            </div>
-
-            <div className="grid gap-2">
-              <label>भोजन आवश्यक</label>
+              <label>बुकिंग प्रकार</label>
               <Select
-                value={formValues.foodRequired}
+                value={formValues.bookingType}
                 onValueChange={(value) =>
-                  handleFieldChange("foodRequired", (value ?? "no") as ApplicantBookingFormValues["foodRequired"])
+                  handleFieldChange(
+                    "bookingType",
+                    (value ?? "FULL_BHAVAN") as ApplicantBookingFormValues["bookingType"]
+                  )
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="भोजन विकल्प चुनें" />
+                  <SelectValue placeholder="बुकिंग प्रकार चुनें" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="yes">हाँ</SelectItem>
-                  <SelectItem value="no">नहीं</SelectItem>
+                  <SelectItem value="FULL_BHAVAN">पूरा भवन</SelectItem>
+                  <SelectItem value="HALF_BHAVAN">आधा भवन</SelectItem>
+                  <SelectItem value="HALL_ONLY">व्यक्तिगत हॉल</SelectItem>
                 </SelectContent>
               </Select>
-              {errors.foodRequired ? <p className="text-sm text-destructive">{errors.foodRequired}</p> : null}
-            </div>
-
-            <div className="grid gap-2">
-              <label htmlFor="expectedGuests">अपेक्षित अतिथि</label>
-              <Input
-                id="expectedGuests"
-                type="number"
-                min={1}
-                value={formValues.expectedGuests}
-                onChange={(event) =>
-                  handleFieldChange("expectedGuests", Number(event.target.value || 0))
-                }
-              />
-              {errors.expectedGuests ? <p className="text-sm text-destructive">{errors.expectedGuests}</p> : null}
+              {errors.bookingType ? <p className="text-sm text-destructive">{errors.bookingType}</p> : null}
             </div>
 
             <div className="grid gap-2">
@@ -478,10 +489,7 @@ export function ApplicantBookingForm() {
                   <strong>कार्यक्रम:</strong> {selectedEventLabel}
                 </p>
                 <p>
-                  <strong>भोजन:</strong> {formValues.foodRequired === "yes" ? "हाँ" : "नहीं"}
-                </p>
-                <p>
-                  <strong>तिथि:</strong> {formValues.eventDate || "—"}
+                  <strong>तिथि:</strong> {formValues.bookedFor || "—"}
                 </p>
                 <p>
                   <strong>समय स्लॉट:</strong> {timeSlotDisplay}
@@ -492,9 +500,6 @@ export function ApplicantBookingForm() {
             <div className="rounded-lg border border-border bg-[#FFFDF7] p-3">
               <h4 className="mb-2 text-sm font-semibold text-primary">संसाधन एवं उपलब्धता</h4>
               <div className="grid gap-1.5">
-                <p>
-                  <strong>अवधि:</strong> {duration}
-                </p>
                 <p>
                   <strong>आवश्यक संसाधन:</strong> {resourceRequired}
                 </p>

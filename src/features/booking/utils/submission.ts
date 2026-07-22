@@ -1,95 +1,52 @@
 import type { ApplicantBookingFormValues } from "@/features/booking/schema"
-import type { BhavanBooking } from "@/features/booking/utils/availability"
 
-export const EVENT_LABELS: Record<
-  Exclude<ApplicantBookingFormValues["eventCode"], "">,
-  string
-> = {
-  sooraj_pooja: "सूरज पूजा",
-  vivah: "विवाह",
-  sagai: "सगाई",
+type EventName = Exclude<ApplicantBookingFormValues["eventName"], "">
+
+export const EVENT_LABELS: Record<EventName, string> = {
+  manglik_karyakram: "मांगलिक कार्यक्रम",
+  shok_uttarkaryakram: "शोक / उत्तरकार्य कार्यक्रम",
   dharmik_karyakram: "धार्मिक कार्यक्रम",
   samaj_karyakram: "समाज कार्यक्रम",
   anya: "अन्य",
 }
 
-const SHEET_EVENT_NAMES: Record<
-  Exclude<ApplicantBookingFormValues["eventCode"], "">,
-  string
-> = {
-  sooraj_pooja: "Sooraj Pooja",
-  vivah: "Vivah",
-  sagai: "Sagai",
+export const EVENT_NAME_MAP: Record<EventName, string> = {
+  manglik_karyakram: "Manglik Event",
+  shok_uttarkaryakram: "Shok / Uttarkary Event",
   dharmik_karyakram: "Religious Event",
   samaj_karyakram: "Social Event",
   anya: "Other",
 }
 
-export function getEventLabel(
-  eventCode: ApplicantBookingFormValues["eventCode"]
-): string {
-  if (!eventCode) {
-    return "चयनित नहीं"
-  }
-
-  return EVENT_LABELS[eventCode]
+export const SHEET_TO_EVENT_MAP: Record<string, EventName> = {
+  "Manglik Event": "manglik_karyakram",
+  "Shok / Uttarkary Event": "shok_uttarkaryakram",
+  "Religious Event": "dharmik_karyakram",
+  "Social Event": "samaj_karyakram",
+  "Other": "anya",
 }
 
-export function getSheetEventName(
-  eventCode: ApplicantBookingFormValues["eventCode"]
-): string {
-  if (!eventCode) {
-    return "Other"
-  }
-
-  return SHEET_EVENT_NAMES[eventCode]
+export const BOOKING_TYPE_LABELS: Record<
+  Exclude<ApplicantBookingFormValues["bookingType"], "">,
+  string
+> = {
+  FULL_BHAVAN: "पूरा भवन",
+  HALF_BHAVAN: "आधा भवन",
+  HALL_ONLY: "व्यक्तिगत हॉल",
 }
 
-export function getResourceType(
-  eventCode: ApplicantBookingFormValues["eventCode"],
-  foodRequired: ApplicantBookingFormValues["foodRequired"]
-): BhavanBooking["resourceType"] {
-  switch (eventCode) {
-    case "vivah":
-    case "samaj_karyakram":
-      return "FULL_BHAVAN"
-    case "sooraj_pooja":
-      return foodRequired === "yes" ? "HALF_BHAVAN" : "HALL_ONLY"
-    default:
-      return foodRequired === "yes" ? "HALF_BHAVAN" : "HALL_ONLY"
-  }
+export function getEventLabel(eventName: ApplicantBookingFormValues["eventName"]): string {
+  return eventName ? EVENT_LABELS[eventName] : "चयनित नहीं"
 }
 
-export function getResourceRequirement(
-  eventCode: ApplicantBookingFormValues["eventCode"],
-  foodRequired: ApplicantBookingFormValues["foodRequired"]
-): string {
-  const resourceType = getResourceType(eventCode, foodRequired)
-
-  switch (resourceType) {
-    case "FULL_BHAVAN":
-      return "पूर्ण भवन"
-    case "HALF_BHAVAN":
-      return "आधा भवन"
-    case "HALL_ONLY":
-      return "व्यक्तिगत हॉल"
-  }
+export function getSheetEventName(eventName: ApplicantBookingFormValues["eventName"]): string {
+  return eventName ? EVENT_NAME_MAP[eventName] : "Other"
 }
 
-export function getDuration(eventCode: ApplicantBookingFormValues["eventCode"]): string {
-  if (eventCode === "vivah" || eventCode === "samaj_karyakram") {
-    return "पूरा दिन"
-  }
-
-  return "आधा दिन"
+export function getBookingTypeLabel(bookingType: ApplicantBookingFormValues["bookingType"]): string {
+  return bookingType ? BOOKING_TYPE_LABELS[bookingType] : "चयनित नहीं"
 }
 
-export function getTimeSlotDisplay(
-  eventCode: ApplicantBookingFormValues["eventCode"]
-): string {
-  if (eventCode === "vivah" || eventCode === "samaj_karyakram") {
-    return "पूरा दिन"
-  }
-
-  return "सुबह / शाम"
+export function getTimeSlotDisplay(eventName: ApplicantBookingFormValues["eventName"]): string {
+  return eventName === "manglik_karyakram" || eventName === "samaj_karyakram" ? "पूरा दिन" : "सुबह / शाम"
 }

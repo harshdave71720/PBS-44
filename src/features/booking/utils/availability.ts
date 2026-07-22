@@ -3,13 +3,14 @@ import { startOfDay, addDays, addMonths, endOfMonth } from 'date-fns';
 export interface BhavanBooking {
   bookingDate: string;
   bookedFor?: string;
-  membershipNumber: number;
+  membershipNumber: string;
+  memberName: string;
+  memberMobileNumber: string;
   applicantName: string;
   gaonName: string;
-  mobileNumber: string;
+  applicantMobileNumber: string;
   eventName: string;
-  foodRequired: string;
-  resourceType: 'FULL_BHAVAN' | 'HALF_BHAVAN' | 'HALL_ONLY';
+  bookingType: 'FULL_BHAVAN' | 'HALF_BHAVAN' | 'HALL_ONLY';
   bookingStatus: 'CONFIRMED' | 'PENDING' | 'SOCIETY_EVENT' | 'MAINTENANCE';
   paymentStatus: 'PAID' | 'PENDING' | 'PARTIAL';
   remarks: string;
@@ -24,9 +25,8 @@ export interface PublicBookingInfo {
   bookingDate: string;
   gaonName: string;
   eventName: string;
-  resourceType: BhavanBooking['resourceType'];
+  bookingType: BhavanBooking['bookingType'];
   bookingStatus: BhavanBooking['bookingStatus'];
-  foodRequired: string;
 }
 
 export type UIStatus =
@@ -80,15 +80,15 @@ export function calculateDailyAvailability(
 
     if (
       booking.bookingStatus === 'MAINTENANCE' ||
-      booking.resourceType === 'FULL_BHAVAN'
+      booking.bookingType === 'FULL_BHAVAN'
     ) {
       result[key] = 'FULLY_BOOKED';
       continue;
     }
 
     if (
-      booking.resourceType === 'HALF_BHAVAN' ||
-      booking.resourceType === 'HALL_ONLY'
+      booking.bookingType === 'HALF_BHAVAN' ||
+      booking.bookingType === 'HALL_ONLY'
     ) {
       // A second partial booking on the same day fills the venue
       result[key] =
@@ -118,15 +118,14 @@ export function buildPublicBookingsMap(
     if (date < minDate || date > maxDate) continue;
 
     const key = effectiveDate;
-    // Destructure only the safe fields — applicantName, mobileNumber, and
+    // Destructure only the safe fields — applicantName, applicantMobileNumber, and
     // membershipNumber are intentionally left out.
     const publicInfo: PublicBookingInfo = {
       bookingDate: booking.bookingDate,
       gaonName: booking.gaonName,
       eventName: booking.eventName,
-      resourceType: booking.resourceType,
+      bookingType: booking.bookingType,
       bookingStatus: booking.bookingStatus,
-      foodRequired: booking.foodRequired,
     };
 
     result[key] = [...(result[key] ?? []), publicInfo];
