@@ -1,4 +1,4 @@
-import { google } from 'googleapis';
+﻿import { google } from 'googleapis';
 import { parse, format, isValid } from 'date-fns';
 import { BhavanBooking } from '@/features/booking/utils/availability';
 
@@ -119,6 +119,80 @@ export async function createBookingRequest({
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [row] },
   });
+}
+
+export type SaveDirectoryRequestParams = {
+  membershipNumber: string | number;
+  memberName: string;
+  memberMobileNumber: string;
+  gaonName: string;
+  applicantName: string;
+  applicantMobileNumber: string;
+  changeDetail: 'MobileNumber' | 'Address' | 'Both';
+  updatedDetails: string;
+};
+
+export async function saveDirectoryRequest({
+  membershipNumber,
+  memberName,
+  memberMobileNumber,
+  gaonName,
+  applicantName,
+  applicantMobileNumber,
+  changeDetail,
+  updatedDetails,
+}: SaveDirectoryRequestParams) {
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+  if (!spreadsheetId) {
+    throw new Error('GOOGLE_SHEET_ID is missing from environment variables.');
+  }
+
+  const timestamp = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
+  const row = [
+    membershipNumber,
+    memberName,
+    memberMobileNumber,
+    gaonName,
+    applicantName,
+    applicantMobileNumber,
+    changeDetail,
+    timestamp,
+    updatedDetails,
+    'PENDING',
+  ];
+
+  const sheets = getSheetsClient();
+  await sheets.spreadsheets.values.append({
+    spreadsheetId,
+    range: "'Directory_Requests'!A:J",
+    valueInputOption: 'USER_ENTERED',
+    requestBody: { values: [row] },
+  });
+}
+export async function getMembersFromDirectory(): Promise<
+  { membershipNo: string; fullName: string; address: string; village: string; mobile: string }[]
+> {
+  try {
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    if (!spreadsheetId) throw new Error('GOOGLE_SHEET_ID is missing.');
+
+    const sheets = getSheetsClient();
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "'Directory'!A2:E",
+    });
+
+    return (response.data.values ?? []).map((row) => ({
+      membershipNo: row[0] ?? '',
+      fullName: row[1] ?? '',
+      address: row[2] ?? '',
+      village: row[3] ?? '',
+      mobile: row[4] ?? '',
+    }));
+  } catch (error) {
+    console.error('Failed to fetch members from Directory sheet:', error);
+    return [];
+  }
 }
 
 export async function getBhavanBookings(
