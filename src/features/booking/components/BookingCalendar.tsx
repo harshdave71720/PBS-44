@@ -44,29 +44,82 @@ function DayStatusIndicator({ status }: { status: UIStatus | undefined }) {
   if (status === 'FULLY_BOOKED') return <span>❌</span>;
   if (status === 'TENTATIVE') return <span>⚠️</span>;
   if (status === 'PARTIALLY_AVAILABLE') return <span>⚠️</span>;
+  if (status === 'PARTIALLY_BOOKED') return <span>⚠️</span>;
   if (status === 'SOCIETY_EVENT') return <span>卐</span>;
   return <span className="mt-1 text-[10px] text-green-600">उपलब्ध</span>;
+}
+
+function PartialBookingModal({
+  date,
+  bhavanType,
+  onClose,
+}: {
+  date: string;
+  bhavanType: BhavanType;
+  onClose: () => void;
+}) {
+  const href = `/booking-form?selectedDate=${encodeURIComponent(date)}&bhavan=${encodeURIComponent(bhavanType)}`;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="w-full max-w-md rounded-xl border border-border bg-[#FFFDF7] p-6 shadow-xl">
+        <p className="text-sm leading-relaxed text-foreground">
+          चूंकि आधा भवन पहले से ही बुक हो चुका है, लेकिन भवन का कुछ हिस्सा अभी भी बुक किया जा
+          सकता है। हम आपका अनुरोध स्वीकार कर रहे हैं, लेकिन भवन मंत्री से समन्वय के बाद ही
+          बुकिंग की पुष्टि की जा सकेगी।
+        </p>
+        <div className="mt-5 flex gap-3">
+          <Link
+            href={href}
+            className="flex-1 rounded-md bg-[#7A1C1C] px-4 py-2 text-center text-sm font-semibold text-white transition-colors hover:bg-[#5e1515]"
+          >
+            आगे बढ़ें
+          </Link>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 rounded-md border border-border bg-[#FFFDF7] px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-[#F7EAD3]"
+          >
+            रद्द करें
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function BookingDetailPanel({
   date,
   bookings,
-  isAvailable,
-  isPending,
+  status,
   bhavanLabel,
   bhavanType,
 }: {
   date: string;
   bookings: PublicBookingInfo[];
-  isAvailable: boolean;
-  isPending: boolean;
+  status: UIStatus;
   bhavanLabel: string;
   bhavanType: BhavanType;
 }) {
+  const [showModal, setShowModal] = useState(false);
   const displayDate = format(parseISO(date), 'd MMMM yyyy');
+  const isAvailable = status === 'AVAILABLE';
+  const isPartiallyBooked = status === 'PARTIALLY_BOOKED';
+  const isFullyBooked = status === 'FULLY_BOOKED';
+  const isPending = status === 'TENTATIVE';
+
+  const confirmedBookings = bookings.filter((b) => b.bookingStatus === 'CONFIRMED');
 
   return (
     <div className="flex flex-col items-start rounded-lg border border-border bg-[#FFFDF7] p-3 text-left text-sm">
+      {showModal && (
+        <PartialBookingModal
+          date={date}
+          bhavanType={bhavanType}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+
       <div className="mb-3">
         <p className="font-semibold text-primary">
           {displayDate} — {bhavanLabel} बुकिंग विवरण
@@ -89,7 +142,7 @@ function BookingDetailPanel({
         </div>
       ) : (
         <div className="grid w-full gap-3 text-left">
-          {bookings.map((booking, index) => (
+          {confirmedBookings.map((booking, index) => (
             <div key={`${booking.bookingDate}-${index}`} className="space-y-1 text-left">
               <p>
                 <strong>Venue:</strong>{' '}
@@ -106,9 +159,26 @@ function BookingDetailPanel({
               )}
             </div>
           ))}
+
           {isPending ? (
             <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-left font-medium text-amber-900">
               अधिक जानकारी के लिए भवन मंत्री से संपर्क करें।
+            </p>
+          ) : null}
+
+          {isPartiallyBooked ? (
+            <button
+              type="button"
+              onClick={() => setShowModal(true)}
+              className="inline-flex w-fit rounded-md bg-[#dcd0a6] px-4 py-2 text-sm font-semibold text-[#7A1C1C] transition-colors hover:bg-[#d1c18f]"
+            >
+              आवेदन पत्र भरें →
+            </button>
+          ) : null}
+
+          {isFullyBooked ? (
+            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-left font-medium text-red-800">
+              यह तारीख पूरी तरह बुक हो चुकी है।
             </p>
           ) : null}
         </div>
@@ -211,8 +281,7 @@ export function BookingCalendar({
               <BookingDetailPanel
                 date={selectedDate}
                 bookings={publicBookingsMap[selectedDate] ?? []}
-                isAvailable={(statusMap[selectedDate] ?? 'AVAILABLE') === 'AVAILABLE'}
-                isPending={(statusMap[selectedDate] ?? 'AVAILABLE') === 'TENTATIVE'}
+                status={statusMap[selectedDate] ?? 'AVAILABLE'}
                 bhavanLabel={bhavanLabel}
                 bhavanType={bhavanType}
               />

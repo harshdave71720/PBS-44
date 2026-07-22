@@ -33,6 +33,7 @@ export type UIStatus =
   | 'AVAILABLE'
   | 'TENTATIVE'
   | 'PARTIALLY_AVAILABLE'
+  | 'PARTIALLY_BOOKED'
   | 'FULLY_BOOKED'
   | 'SOCIETY_EVENT';
 
@@ -48,6 +49,7 @@ export function calculateDailyAvailability(
 ): Record<string, UIStatus> {
   const { minDate, maxDate } = getBookingDateBoundaries();
   const result: Record<string, UIStatus> = {};
+  const weightMap: Record<string, number> = {};
 
   for (const booking of bookings) {
     // bookedFor is the actual reservation date; fall back to bookingDate for
@@ -78,21 +80,22 @@ export function calculateDailyAvailability(
       continue;
     }
 
-    if (
-      booking.bookingStatus === 'MAINTENANCE' ||
-      booking.bookingType === 'FULL_BHAVAN'
-    ) {
+    if (booking.bookingStatus === 'MAINTENANCE') {
       result[key] = 'FULLY_BOOKED';
       continue;
     }
 
-    if (
-      booking.bookingType === 'HALF_BHAVAN' ||
-      booking.bookingType === 'HALL_ONLY'
-    ) {
-      // A second partial booking on the same day fills the venue
-      result[key] =
-        current === 'PARTIALLY_AVAILABLE' ? 'FULLY_BOOKED' : 'PARTIALLY_AVAILABLE';
+    if (booking.bookingStatus !== 'CONFIRMED') continue;
+
+    // Weight-based aggregation: FULL_BHAVAN = 1.0, HALF_BHAVAN / HALL_ONLY = 0.5
+    const addedWeight = booking.bookingType === 'FULL_BHAVAN' ? 1.0 : 0.5;
+    const newWeight = (weightMap[key] ?? 0) + addedWeight;
+    weightMap[key] = newWeight;
+
+    if (newWeight >= 1.0) {
+      result[key] = 'FULLY_BOOKED';
+    } else {
+      result[key] = 'PARTIALLY_BOOKED';
     }
   }
 
@@ -118,8 +121,6 @@ export function buildPublicBookingsMap(
     if (date < minDate || date > maxDate) continue;
 
     const key = effectiveDate;
-    // Destructure only the safe fields — applicantName, applicantMobileNumber, and
-    // membershipNumber are intentionally left out.
     const publicInfo: PublicBookingInfo = {
       bookingDate: booking.bookingDate,
       gaonName: booking.gaonName,

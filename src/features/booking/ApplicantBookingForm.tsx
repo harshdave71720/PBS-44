@@ -34,8 +34,8 @@ import {
   getBookingTypeLabel,
   getEventLabel,
   getSheetEventName,
-  getTimeSlotDisplay,
 } from "@/features/booking/utils/submission"
+import type { PublicBookingInfo } from "@/features/booking/utils/availability"
 
 type FieldErrors = Partial<Record<keyof ApplicantBookingFormValues, string>>
 type AvailabilityViewStatus = "not_selected" | "available" | "partial" | "unavailable"
@@ -142,6 +142,7 @@ export function ApplicantBookingForm() {
   }))
   const [errors, setErrors] = useState<FieldErrors>({})
   const [monthRecords, setMonthRecords] = useState<AvailabilityRecord[]>([])
+  const [dateBookings, setDateBookings] = useState<PublicBookingInfo[]>([])
   const [submitError, setSubmitError] = useState<string>("")
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false)
@@ -182,16 +183,53 @@ export function ApplicantBookingForm() {
     return monthRecords.find((record) => record.date === formValues.bookedFor)
   }, [formValues.bookedFor, monthRecords])
 
+  // Fetch confirmed bookings for the selected date + bhavan to compute real capacity
+  useEffect(() => {
+    if (!formValues.bookedFor) {
+      setDateBookings([])
+      return
+    }
+    let isMounted = true
+    fetch(
+      `/api/bookings?date=${encodeURIComponent(formValues.bookedFor)}&bhavan=${encodeURIComponent(formValues.bhavanType)}`
+    )
+      .then((res) => res.json())
+      .then((data: { bookings?: PublicBookingInfo[] }) => {
+        if (isMounted) setDateBookings(data.bookings ?? [])
+      })
+      .catch(() => { if (isMounted) setDateBookings([]) })
+    return () => { isMounted = false }
+  }, [formValues.bookedFor, formValues.bhavanType])
+
+  // Weight-based capacity: FULL_BHAVAN=1.0, HALF_BHAVAN/HALL_ONLY=0.5
+  const bookedWeight = useMemo(
+    () => dateBookings.reduce((sum, b) => sum + (b.bookingType === "FULL_BHAVAN" ? 1.0 : 0.5), 0),
+    [dateBookings]
+  )
+  const remainingCapacity = Math.max(0, 1.0 - bookedWeight)
+  const isPartiallyBooked = remainingCapacity === 0.5
+
   const availabilityStatus: AvailabilityViewStatus = formValues.bookedFor
     ? selectedDateRecord
       ? toAvailabilityViewStatus(selectedDateRecord.status)
       : "available"
     : "not_selected"
 
-  const hasSelectedEvent = Boolean(formValues.eventName)
-  const availabilityDisplay = getAvailabilityDisplay(availabilityStatus)
-  const resourceRequired = getBookingTypeLabel(formValues.bookingType)
-  const timeSlotDisplay = hasSelectedEvent ? getTimeSlotDisplay(formValues.eventName) : "—"
+  // When the date is partially booked, FULL_BHAVAN is not allowed — force to HALF_BHAVAN
+  useEffect(() => {
+    if (isPartiallyBooked && formValues.bookingType === "FULL_BHAVAN") {
+      setFormValues((prev) => ({ ...prev, bookingType: "HALF_BHAVAN" }))
+    }
+  }, [isPartiallyBooked, formValues.bookingType])
+
+  const availabilityDisplay = isPartiallyBooked
+    ? { label: "⚠️ आंशिक उपलब्ध", className: "text-amber-700" }
+    : remainingCapacity === 0
+    ? { label: "❌ उपलब्ध नहीं", className: "text-red-700" }
+    : getAvailabilityDisplay(availabilityStatus)
+  const resourceRequired = isPartiallyBooked
+    ? "आधा भवन (शेष भाग)"
+    : getBookingTypeLabel(formValues.bookingType)
   const selectedBhavanLabel =
     BHAVAN_OPTIONS.find((option) => option.value === formValues.bhavanType)?.label ?? "मुख्य धर्मशाला"
   const selectedEventLabel = getEventLabel(formValues.eventName)
@@ -433,11 +471,17 @@ export function ApplicantBookingForm() {
                   <SelectValue placeholder="बुकिंग प्रकार चुनें" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="FULL_BHAVAN">पूरा भवन</SelectItem>
+                  <SelectItem value="FULL_BHAVAN" disabled={isPartiallyBooked}>पूरा भवन</SelectItem>
                   <SelectItem value="HALF_BHAVAN">आधा भवन</SelectItem>
                   <SelectItem value="HALL_ONLY">व्यक्तिगत हॉल</SelectItem>
                 </SelectContent>
               </Select>
+              {isPartiallyBooked && formValues.bookedFor ? (
+                <p className="text-sm font-medium text-amber-700">
+                  {new Date(formValues.bookedFor).toLocaleDateString("hi-IN", { day: "numeric", month: "long" })}{" "}
+                  को आधा भवन पूर्व में बुक हो चुका है। आप केवल शेष आधा भवन बुक कर सकते हैं।
+                </p>
+              ) : null}
               {errors.bookingType ? <p className="text-sm text-destructive">{errors.bookingType}</p> : null}
             </div>
 
@@ -490,9 +534,6 @@ export function ApplicantBookingForm() {
                 </p>
                 <p>
                   <strong>तिथि:</strong> {formValues.bookedFor || "—"}
-                </p>
-                <p>
-                  <strong>समय स्लॉट:</strong> {timeSlotDisplay}
                 </p>
               </div>
             </div>
