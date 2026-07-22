@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { ChevronDown } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -32,15 +33,25 @@ export function Header({ nav }: HeaderProps) {
 
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="flex flex-col leading-tight group">
-          <span
-            className="text-xs font-semibold text-primary-foreground transition-colors group-hover:text-accent sm:text-sm"
-            title={siteConfig.name}
-          >
-            श्री पालीवाल ब्राह्मण समाज पंचायत
-          </span>
-          <span className="text-xs font-semibold text-primary-foreground/90 sm:text-sm">
-            44 श्रेणी ( रजि. ), इंदौर
+        <Link href="/" className="flex items-center gap-3 group">
+          <Image
+            src="/images/logo.png"
+            alt="श्री पालीवाल ब्राह्मण समाज पंचायत लोगो"
+            width={48}
+            height={48}
+            className="h-10 w-auto sm:h-12 shrink-0"
+            priority
+          />
+          <span className="flex flex-col leading-tight">
+            <span
+              className="text-xs font-semibold text-primary-foreground transition-colors group-hover:text-accent sm:text-sm"
+              title={siteConfig.name}
+            >
+              श्री पालीवाल ब्राह्मण समाज पंचायत
+            </span>
+            <span className="text-xs font-semibold text-primary-foreground/90 sm:text-sm">
+              44 श्रेणी ( रजि. ), इंदौर
+            </span>
           </span>
         </Link>
 
