@@ -3,25 +3,25 @@ import { defaultLocale } from "@/config/i18n"
 import { HeroSection } from "@/features/home/HeroSection"
 import { BookingActionsSection } from "@/features/home/BookingActionsSection"
 import { AnnouncementsSection } from "@/features/home/AnnouncementsSection"
+import { EkadashiSection } from "@/features/home/EkadashiSection"
 import { ServicesSection } from "@/features/home/ServicesSection"
 import { AboutSection } from "@/features/home/AboutSection"
 import { EventsSection } from "@/features/home/EventsSection"
 import { OrnamentalDivider } from "@/components/shared/OrnamentalDivider"
+import { getUpcomingEkadashis } from "@/features/booking/repositories/googleSheetsRepository"
 
-/**
- * Home page — Server Component.
- * All data is loaded server-side via getDictionary.
- * Locale defaults to Hindi (hi); future multilingual support
- * can be added by passing locale from route params/cookies.
- */
-export default function HomePage() {
+export const dynamic = 'force-dynamic';
+
+export default async function HomePage() {
   const dict = getDictionary(defaultLocale)
+  const ekadashis = await getUpcomingEkadashis()
 
   return (
     <>
       <HeroSection hero={dict.home.hero} />
       <BookingActionsSection />
       <AnnouncementsSection announcements={dict.home.announcements} />
+      <EkadashiSection ekadashis={ekadashis} />
       <OrnamentalDivider className="mx-auto max-w-7xl px-4" />
       <ServicesSection services={dict.home.services} />
       <OrnamentalDivider className="mx-auto max-w-7xl px-4" />

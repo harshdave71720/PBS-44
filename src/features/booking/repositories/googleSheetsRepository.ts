@@ -169,6 +169,49 @@ export async function saveDirectoryRequest({
     requestBody: { values: [row] },
   });
 }
+export interface EkadashiBooking {
+  date: string;
+  maahAndPaksh: string;
+  ekadashiNaam: string;
+  day: string;
+  whoBooked?: string;
+  village?: string;
+}
+
+export async function getUpcomingEkadashis(): Promise<EkadashiBooking[]> {
+  try {
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    if (!spreadsheetId) throw new Error('GOOGLE_SHEET_ID is missing.');
+
+    const sheets = getSheetsClient();
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "'Ekadashi'!A2:F",
+    });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return (response.data.values ?? []).flatMap((row) => {
+      const raw = String(row[0] ?? '').trim();
+      const [d, m, y] = raw.split('/');
+      const date = new Date(Number(y), Number(m) - 1, Number(d));
+      if (isNaN(date.getTime()) || date < today) return [];
+      return [{
+        date: raw,
+        maahAndPaksh: String(row[1] ?? '').trim(),
+        ekadashiNaam: String(row[2] ?? '').trim(),
+        day: String(row[3] ?? '').trim(),
+        whoBooked: String(row[4] ?? '').trim() || undefined,
+        village: String(row[5] ?? '').trim() || undefined,
+      }];
+    });
+  } catch (error) {
+    console.error('Failed to fetch Ekadashi data:', error);
+    return [];
+  }
+}
+
 export async function getMembersFromDirectory(): Promise<
   { membershipNo: string; fullName: string; address: string; village: string; mobile: string }[]
 > {
