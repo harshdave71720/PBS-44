@@ -4,6 +4,14 @@
     { "label": "Samaj Constitution", "href": "/samaj-ka-vidhan" },
     { "label": "Annual Festival", "href": "/varshik-utsav" },
     { "label": "Executive Committee", "href": "/executive-committee" },
-    { "label": "Contact", "href": "/sampark" }
+    { "label": "Contact", "href": "/sampark" },
+    {
+      "label": "More",
+      "href": "#",
+      "children": [
+        { "label": "Ekadashi List", "href": "/ekadashi" },
+        { "label": "Obituaries", "href": "/demise" }
+      ]
+    }
   ]
 }

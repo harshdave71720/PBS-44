@@ -20,6 +20,14 @@
     {
       "label": "संपर्क",
       "href": "/sampark"
+    },
+    {
+      "label": "अन्य",
+      "href": "#",
+      "children": [
+        { "label": "एकादशी सूची", "href": "/ekadashi" },
+        { "label": "शोक संदेश", "href": "/demise" }
+      ]
     }
   ]
 }
